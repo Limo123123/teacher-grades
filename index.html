@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anne Frank RS - Lehrer Bewertung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .canvas-container {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 bg-slate-100 min-h-screen flex flex-col">
+
+    <nav class="bg-white text-slate-800 p-4 shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showDashboard()">
+                <div
+                    class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg">
+                    🎓</div>
+                <div>
+                    <h1 class="text-lg font-bold leading-tight text-slate-900">Anne Frank Realschule</h1>
+                    <p class="text-xs text-slate-500 font-medium tracking-wide">LEHRER BEWERTUNG</p>
+                </div>
+            </div>
+
+            <div id="nav-auth" class="space-x-4 hidden flex items-center">
+                <span id="user-display"
+                    class="font-semibold bg-slate-100 px-3 py-1 rounded text-sm border border-slate-200"></span>
+                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700 font-medium">Abmelden</button>
+            </div>
+            <div id="nav-login">
+                <button onclick="showLogin()"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold shadow-md hover:bg-indigo-700 transition text-sm">Anmelden</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 mt-6 max-w-6xl flex-grow">
+
+        <div id="view-login"
+            class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl hidden mt-10 border border-slate-100 fade-in">
+            <h2 class="text-3xl font-bold mb-2 text-center text-slate-800">Willkommen</h2>
+            <p class="text-center text-slate-500 mb-8">Bitte melde dich mit deiner LimoID an.</p>
+            <form onsubmit="login(event)">
+                <div class="mb-5">
+                    <label
+                        class="block text-slate-700 text-xs font-bold mb-2 uppercase tracking-wider">Benutzername</label>
+                    <input type="text" id="login-user"
+                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                        required>
+                </div>
+                <div class="mb-8">
+                    <label class="block text-slate-700 text-xs font-bold mb-2 uppercase tracking-wider">Passwort</label>
+                    <input type="password" id="login-pass"
+                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                        required>
+                </div>
+                <button type="submit"
+                    class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 transition transform active:scale-[0.98] shadow-lg shadow-indigo-200">Einloggen</button>
+            </form>
+            <p id="login-error" class="text-red-500 mt-6 text-center text-sm font-medium"></p>
+        </div>
+
+        <div id="view-dashboard" class="hidden fade-in">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Lehrerkollegium</h2>
+                        <p class="text-slate-500 text-sm">Finde Lehrer, bewerte sie und erstelle Zeugnisse.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div class="relative w-full md:w-64">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </span>
+                            <input type="text" id="search-input" oninput="handleSearch()" placeholder="Lehrer suchen..."
+                                class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+
+                        <button onclick="generateSchoolCertificate()"
+                            class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition shadow flex items-center justify-center gap-2 font-bold text-sm whitespace-nowrap">
+                            <span>🏫</span> Schulzeugnis
+                        </button>
+
+                        <button id="admin-btn" onclick="showAdminPanel()"
+                            class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900 transition hidden shadow flex items-center justify-center gap-2 font-bold text-sm">
+                            <span>⚙️</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="teacher-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="col-span-full text-center py-20 text-gray-400 flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-2"></div>
+                    Lade Daten...
+                </div>
+            </div>
+
+            <div id="pagination-controls"
+                class="flex justify-center items-center gap-4 hidden bg-white p-4 rounded-xl shadow-sm border border-slate-200 w-fit mx-auto">
+                <button onclick="changePage(-1)" id="btn-prev"
+                    class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition">
+                    &larr; Zurück
+                </button>
+
+                <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
+                    Seite
+                    <input type="number" id="page-input" min="1"
+                        class="w-16 border p-1 text-center rounded focus:ring-indigo-500 focus:border-indigo-500"
+                        onchange="jumpToPage()">
+                    von <span id="total-pages">1</span>
+                </div>
+
+                <button onclick="changePage(1)" id="btn-next"
+                    class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition">
+                    Vor &rarr;
+                </button>
+            </div>
+        </div>
+
+        <div id="view-rate" class="hidden max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-xl fade-in mt-4">
+            <div class="flex items-center justify-between mb-6 border-b pb-4">
+                <h2 class="text-2xl font-bold text-slate-800">Bewertung abgeben</h2>
+                <button onclick="showDashboard()"
+                    class="text-slate-500 hover:text-indigo-600 font-semibold text-sm transition">✕ Abbrechen</button>
+            </div>
+
+            <div class="flex items-center gap-4 mb-8 bg-indigo-50 p-4 rounded-xl">
+                <div class="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-700 text-xl font-bold shadow-inner"
+                    id="rate-avatar">?</div>
+                <div>
+                    <p class="text-sm text-indigo-600 font-bold uppercase tracking-wider">Lehrer/in</p>
+                    <p class="text-xl font-bold text-slate-800" id="rate-teacher-name"></p>
+                </div>
+            </div>
+
+            <p class="text-sm text-slate-500 mb-6 bg-yellow-50 p-3 rounded border border-yellow-100">
+                ℹ️ <strong>Hinweis:</strong> Wenn du ein Fach bei diesem Lehrer nicht hast, wähle bitte das
+                <strong>"X"</strong> (ganz rechts).
+            </p>
+
+            <form id="rating-form" onsubmit="submitRating(event)">
+                <input type="hidden" id="rate-teacher-id">
+                <div class="space-y-3" id="rating-inputs">
+                </div>
+                <div class="mt-8 pt-6 border-t flex justify-end gap-3">
+                    <button type="button" onclick="showDashboard()"
+                        class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">Abbrechen</button>
+                    <button type="submit"
+                        class="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 transform active:scale-95">Bewertung
+                        speichern</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="view-certificate" class="hidden flex flex-col items-center fade-in">
+            <div class="w-full max-w-2xl flex justify-between items-center mb-6">
+                <button onclick="showDashboard()"
+                    class="text-indigo-600 font-bold hover:underline flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+                    <span>&larr;</span> Zurück
+                </button>
+                <a id="download-link"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 cursor-pointer shadow-lg flex items-center gap-2 font-bold"
+                    download="zeugnis.png">
+                    <span>📥</span> Bild speichern
+                </a>
+            </div>
+            <div class="bg-white p-2 rounded shadow-2xl overflow-hidden">
+                <canvas id="cert-canvas" width="595" height="842" class="bg-white"></canvas>
+            </div>
+            <p class="mt-6 text-sm text-gray-400 text-center max-w-lg">Dieses Dokument wurde automatisch generiert
+                basierend auf den abgegebenen Bewertungen der Schüler.</p>
+        </div>
+
+        <div id="view-admin"
+            class="hidden bg-white p-6 rounded-2xl shadow-xl min-h-[600px] border border-slate-200 fade-in">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-800">
+                    <span>⚙️</span> Schul-Verwaltung
+                </h2>
+                <button onclick="showDashboard()"
+                    class="text-slate-400 hover:text-slate-800 font-bold px-3 py-1 rounded hover:bg-slate-100 transition">Schließen
+                    ✕</button>
+            </div>
+
+            <div class="flex space-x-2 mb-6 border-b">
+                <button onclick="switchAdminTab('teachers')" id="tab-btn-teachers"
+                    class="px-6 py-3 rounded-t-lg font-bold border-b-2 transition-colors">Lehrer</button>
+                <button onclick="switchAdminTab('subjects')" id="tab-btn-subjects"
+                    class="px-6 py-3 rounded-t-lg font-bold border-b-2 transition-colors">Fächer</button>
+            </div>
+
+            <div id="admin-tab-teachers" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-slate-50 p-5 rounded-xl border border-slate-200 h-fit sticky top-4">
+                        <h3 class="font-bold text-lg mb-4 text-indigo-700" id="teacher-form-title">Neuen Lehrer
+                            hinzufügen</h3>
+                        <input type="hidden" id="edit-teacher-id">
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Name</label>
+                            <input type="text" id="new-teacher-name" placeholder="z.B. Herr Müller"
+                                class="w-full border border-slate-300 p-2 rounded focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Unterrichtet:</label>
+                            <div id="teacher-subject-select"
+                                class="grid grid-cols-1 gap-2 text-sm max-h-60 overflow-y-auto p-2 border border-slate-200 bg-white rounded shadow-inner">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="saveTeacher()" id="save-teacher-btn"
+                                class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition shadow">Erstellen</button>
+                            <button onclick="resetTeacherForm()" id="cancel-edit-btn"
+                                class="bg-white border border-slate-300 text-slate-600 px-3 py-2 rounded-lg font-bold hover:bg-slate-50 transition hidden">Abbr.</button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <h3 class="font-bold text-lg mb-4 text-slate-700 flex justify-between items-center">
+                            Aktuelles Kollegium
+                            <span class="text-xs bg-slate-200 px-2 py-1 rounded text-slate-600"
+                                id="admin-teacher-count">0</span>
+                        </h3>
+                        <div id="admin-teacher-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-tab-subjects" class="hidden">
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 mb-8">
+                    <h3 class="font-bold text-lg mb-4 text-blue-800">Neues Fach anlegen</h3>
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <input type="text" id="new-subject-label" placeholder="Fach Name (z.B. Informatik)"
+                            class="border p-3 rounded-lg flex-1 shadow-sm">
+                        <select id="new-subject-type" class="border p-3 rounded-lg bg-white shadow-sm cursor-pointer">
+                            <option value="pflicht">Pflichtfach</option>
+                            <option value="wahl">Wahlpflichtfach</option>
+                        </select>
+                        <button onclick="addSubject()"
+                            class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">Hinzufügen</button>
+                    </div>
+                </div>
+
+                <h3 class="font-bold mb-3 text-slate-700">Verfügbare Schulfächer:</h3>
+                <div id="subject-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = 'https://api.limazon.v6.rocks';
+
+        let currentUser = null;
+        let teachersData = [];
+        let subjectsData = [];
+
+        // PAGINATION & FILTER STATE
+        let currentPage = 1;
+        const itemsPerPage = 12; // 3x4 Grid oder 2x6
+        let currentFilter = "";
+
+        // *** AUTHENTICATION ***
+        async function checkAuth() {
+            try {
+                const res = await fetch(API_URL + '/api/auth/me', { credentials: 'include' });
+                if (res.ok) {
+                    currentUser = await res.json();
+                    updateUI(true);
+                    await loadSubjects();
+                    loadTeachers();
+                } else { updateUI(false); }
+            } catch (e) { updateUI(false); }
+        }
+
+        async function login(e) {
+            if (e) e.preventDefault();
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const err = document.getElementById('login-error');
+            err.innerText = "Lade...";
+
+            try {
+                const res = await fetch(API_URL + '/api/auth/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p }), credentials: 'include'
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    err.innerText = "";
+                    updateUI(true);
+                    await loadSubjects();
+                    loadTeachers();
+                } else { err.innerText = "Falsche Daten."; }
+            } catch (e) { err.innerText = "Netzwerkfehler."; }
+        }
+
+        async function logout() {
+            try { await fetch(API_URL + '/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch (e) { }
+            window.location.reload();
+        }
+
+        function updateUI(isLoggedIn) {
+            if (isLoggedIn) {
+                document.getElementById('nav-login').classList.add('hidden');
+                document.getElementById('nav-auth').classList.remove('hidden');
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('user-display').innerText = currentUser.username;
+                if (currentUser.isAdmin) document.getElementById('admin-btn').classList.remove('hidden');
+                if (document.getElementById('view-dashboard').classList.contains('hidden') &&
+                    document.getElementById('view-admin').classList.contains('hidden')) showDashboard();
+            } else {
+                document.getElementById('nav-login').classList.remove('hidden');
+                document.getElementById('nav-auth').classList.add('hidden');
+                showView('view-login');
+            }
+        }
+
+        // *** DATA LOADING ***
+        async function loadSubjects() {
+            try {
+                const res = await fetch(API_URL + '/api/school/subjects', { credentials: 'include' });
+                if (res.ok) { const d = await res.json(); subjectsData = d.subjects; }
+            } catch (e) { }
+        }
+
+        async function loadTeachers() {
+            try {
+                const res = await fetch(API_URL + '/api/school/teachers', { credentials: 'include' });
+                if (res.ok) {
+                    const d = await res.json();
+                    teachersData = d.teachers;
+                    renderTeachers();
+                    if (!document.getElementById('view-admin').classList.contains('hidden') &&
+                        !document.getElementById('admin-tab-teachers').classList.contains('hidden')) {
+                        renderTeacherAdminList();
+                    }
+                }
+            } catch (e) { }
+        }
+
+        // *** NAVIGATION & PAGINATION ***
+        function showView(id) {
+            ['view-login', 'view-dashboard', 'view-rate', 'view-certificate', 'view-admin'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function showDashboard() { showView('view-dashboard'); renderTeachers(); }
+        function showLogin() { showView('view-login'); }
+
+        function handleSearch() {
+            currentFilter = document.getElementById('search-input').value.toLowerCase();
+            currentPage = 1; // Bei neuer Suche immer auf Seite 1 springen
+            renderTeachers();
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            renderTeachers();
+        }
+
+        function jumpToPage() {
+            const val = parseInt(document.getElementById('page-input').value);
+            if (val > 0) {
+                currentPage = val;
+                renderTeachers();
+            }
+        }
+
+        // *** RENDER DASHBOARD ***
+        function renderTeachers() {
+            const list = document.getElementById('teacher-list');
+            list.innerHTML = '';
+
+            // 1. Filtern
+            let filtered = teachersData.filter(t => t.name.toLowerCase().includes(currentFilter));
+
+            // 2. Paginierung Berechnen
+            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageItems = filtered.slice(startIndex, endIndex);
+
+            // 3. UI Updates für Paginierung
+            document.getElementById('total-pages').innerText = totalPages;
+            document.getElementById('page-input').value = currentPage;
+            document.getElementById('btn-prev').disabled = currentPage === 1;
+            document.getElementById('btn-next').disabled = currentPage === totalPages;
+
+            const pagControls = document.getElementById('pagination-controls');
+            if (filtered.length > 0) pagControls.classList.remove('hidden');
+            else pagControls.classList.add('hidden');
+
+            // 4. Render Items
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-xl shadow border border-slate-200 text-slate-500">Keine Lehrer gefunden.</div>`;
+                return;
+            }
+
+            pageItems.forEach(t => {
+                const avg = t.totalAverage ? t.totalAverage.toFixed(2) : '-';
+                const mySubjects = (t.subjectIds || []).map(sid => subjectsData.find(s => s.id === sid)).filter(s => s);
+                const subBadges = mySubjects.slice(0, 4).map(s =>
+                    `<span class="text-[10px] uppercase font-bold tracking-wider bg-slate-100 px-2 py-1 rounded text-slate-600 border border-slate-200">${s.label.substring(0, 15)}</span>`
+                ).join('');
+                const moreText = mySubjects.length > 4 ? `<span class="text-xs text-gray-400 font-bold">+${mySubjects.length - 4}</span>` : '';
+
+                list.innerHTML += `
+                    <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition border border-slate-200 flex flex-col h-full hover:border-indigo-300 group">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
+                                    ${t.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-800 truncate pr-2 group-hover:text-indigo-700 transition">${t.name}</h3>
+                            </div>
+                            <div class="bg-slate-50 text-slate-700 font-bold px-3 py-1 rounded-lg border border-slate-200 whitespace-nowrap text-sm">
+                                Ø ${avg}
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex flex-wrap gap-1 mb-3 items-center min-h-[24px]">
+                                ${subBadges || '<span class="text-xs text-gray-400 italic">Keine Fächer</span>'} ${moreText}
+                            </div>
+                            <p class="text-slate-400 text-xs flex items-center gap-1 font-medium">📝 ${t.ratingCount || 0} Bewertungen</p>
+                        </div>
+                        <div class="flex gap-2 mt-5 pt-4 border-t border-slate-100">
+                            <button onclick="openRateView('${t._id}')" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">Bewerten</button>
+                            <button onclick="generateCertificate('${t._id}')" class="flex-1 bg-white border border-slate-200 text-slate-700 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 hover:text-indigo-600 transition">Zeugnis</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // *** RATING ***
+        function openRateView(id) {
+            const t = teachersData.find(x => x._id === id);
+            if (!t) return;
+            document.getElementById('rate-teacher-name').innerText = t.name;
+            document.getElementById('rate-teacher-id').value = id;
+            document.getElementById('rate-avatar').innerText = t.name.substring(0, 2).toUpperCase();
+            const container = document.getElementById('rating-inputs');
+            container.innerHTML = '';
+
+            if (!t.subjectIds || t.subjectIds.length === 0) {
+                container.innerHTML = `<div class="text-center p-6 bg-yellow-50 rounded-lg border text-yellow-800">Keine Fächer zugeordnet.</div>`;
+                showView('view-rate'); return;
+            }
+
+            t.subjectIds.forEach(sid => {
+                const sub = subjectsData.find(s => s.id === sid);
+                if (!sub) return;
+                container.innerHTML += `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 gap-3 hover:border-indigo-200 transition">
+                        <label class="font-bold text-slate-700 w-1/3">${sub.label}</label>
+                        <div class="flex gap-1 justify-end flex-1">
+                            <label class="cursor-pointer group relative mr-4 flex flex-col items-center">
+                                <input type="radio" name="${sid}" value="0" class="peer sr-only" checked>
+                                <span class="block w-10 h-10 flex items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-slate-300 font-bold peer-checked:bg-slate-200 peer-checked:text-slate-500 peer-checked:border-slate-300 hover:bg-slate-100 transition select-none">✕</span>
+                                <span class="text-[9px] text-slate-400 mt-1 uppercase font-bold tracking-wider">Egal</span>
+                            </label>
+                            ${[1, 2, 3, 4, 5, 6].map(n => `
+                                <label class="cursor-pointer group relative flex flex-col items-center">
+                                    <input type="radio" name="${sid}" value="${n}" class="peer sr-only">
+                                    <span class="block w-10 h-10 flex items-center justify-center rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-600 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:border-indigo-300 transition select-none shadow-sm">${n}</span>
+                                </label>`).join('')}
+                        </div>
+                    </div>`;
+            });
+            showView('view-rate');
+        }
+
+        async function submitRating(e) {
+            e.preventDefault();
+            const tId = document.getElementById('rate-teacher-id').value;
+            const grades = {};
+            let hasAtLeastOneGrade = false;
+            document.querySelectorAll('#rating-inputs input[type="radio"]:checked').forEach(inp => {
+                const val = parseInt(inp.value);
+                if (val > 0) { grades[inp.name] = val; hasAtLeastOneGrade = true; }
+            });
+            if (!hasAtLeastOneGrade) return alert("Bitte wähle mindestens eine Note (1-6).");
+
+            try {
+                const res = await fetch(API_URL + '/api/school/rate', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ teacherId: tId, grades }), credentials: 'include'
+                });
+                if (res.ok) { alert("Gespeichert!"); showDashboard(); } else { const d = await res.json(); alert("Fehler: " + d.error); }
+            } catch (e) { alert("Fehler."); }
+        }
+
+        // *** ADMIN ***
+        function showAdminPanel() { showView('view-admin'); switchAdminTab('teachers'); }
+        function switchAdminTab(tab) {
+            document.getElementById('admin-tab-teachers').classList.add('hidden');
+            document.getElementById('admin-tab-subjects').classList.add('hidden');
+            const btnT = document.getElementById('tab-btn-teachers');
+            const btnS = document.getElementById('tab-btn-subjects');
+            [btnT, btnS].forEach(b => b.className = "px-6 py-3 rounded-t-lg font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors");
+            const activeClass = "px-6 py-3 rounded-t-lg font-bold border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
+            if (tab === 'teachers') {
+                document.getElementById('admin-tab-teachers').classList.remove('hidden');
+                btnT.className = activeClass;
+                renderTeacherAdminList();
+                renderTeacherCreationFormSubjects();
+            } else {
+                document.getElementById('admin-tab-subjects').classList.remove('hidden');
+                btnS.className = activeClass;
+                renderSubjectList();
+            }
+        }
+
+        // Admin Teachers
+        function renderTeacherCreationFormSubjects() {
+            const container = document.getElementById('teacher-subject-select');
+            container.innerHTML = '';
+            const sorted = [...subjectsData].sort((a, b) => {
+                if (a.type === b.type) return a.label.localeCompare(b.label);
+                return a.type === 'pflicht' ? -1 : 1;
+            });
+            sorted.forEach(s => {
+                container.innerHTML += `
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-2 rounded transition">
+                        <input type="checkbox" value="${s.id}" class="new-teacher-sub-check rounded w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                        <span class="truncate text-slate-700 font-medium" title="${s.label}">${s.label}</span>
+                        ${s.type === 'pflicht' ? '<span class="ml-auto text-[10px] bg-blue-100 text-blue-600 px-1 rounded font-bold">P</span>' : '<span class="ml-auto text-[10px] bg-orange-100 text-orange-600 px-1 rounded font-bold">W</span>'}
+                    </label>`;
+            });
+        }
+
+        function renderTeacherAdminList() {
+            const list = document.getElementById('admin-teacher-list');
+            document.getElementById('admin-teacher-count').innerText = teachersData.length;
+            list.innerHTML = '';
+            const sorted = [...teachersData].sort((a, b) => a.name.localeCompare(b.name));
+            sorted.forEach(t => {
+                const subCount = (t.subjectIds || []).length;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-white p-3 border rounded-lg shadow-sm hover:border-indigo-300 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-xs">${t.name.substring(0, 2).toUpperCase()}</div>
+                            <div><span class="font-bold block text-sm text-slate-800">${t.name}</span><span class="text-xs text-slate-400">${subCount} Fächer • ${t.ratingCount || 0} Votes</span></div>
+                        </div>
+                        <div class="flex gap-2 opacity-100 sm:opacity-50 group-hover:opacity-100 transition">
+                            <button onclick="startEditTeacher('${t._id}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded text-xs font-bold uppercase border border-blue-100">Bearb.</button>
+                            <button onclick="deleteTeacher('${t._id}')" class="text-red-500 hover:bg-red-50 p-2 rounded text-xs font-bold uppercase border border-red-100">Löschen</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function startEditTeacher(id) {
+            const t = teachersData.find(x => x._id === id); if (!t) return;
+            document.getElementById('edit-teacher-id').value = id;
+            document.getElementById('new-teacher-name').value = t.name;
+            const title = document.getElementById('teacher-form-title');
+            title.innerText = "Lehrer bearbeiten"; title.classList.add("text-orange-600");
+            const btn = document.getElementById('save-teacher-btn');
+            btn.innerText = "Speichern"; btn.className = "flex-1 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition shadow";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            const checks = document.querySelectorAll('.new-teacher-sub-check');
+            checks.forEach(c => { c.checked = (t.subjectIds || []).includes(c.value); });
+            document.getElementById('admin-tab-teachers').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetTeacherForm() {
+            document.getElementById('edit-teacher-id').value = '';
+            document.getElementById('new-teacher-name').value = '';
+            const title = document.getElementById('teacher-form-title');
+            title.innerText = "Neuen Lehrer hinzufügen"; title.classList.remove("text-orange-600");
+            const btn = document.getElementById('save-teacher-btn');
+            btn.innerText = "Erstellen"; btn.className = "flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition shadow";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.querySelectorAll('.new-teacher-sub-check').forEach(c => c.checked = false);
+        }
+
+        async function saveTeacher() {
+            const id = document.getElementById('edit-teacher-id').value;
+            const name = document.getElementById('new-teacher-name').value;
+            const checks = document.querySelectorAll('.new-teacher-sub-check:checked');
+            const subjectIds = Array.from(checks).map(c => c.value);
+            if (!name.trim()) return alert("Name fehlt");
+            let url = API_URL + '/api/school/admin/teachers';
+            let method = 'POST';
+            if (id) { url += '/' + id; method = 'PUT'; }
+            try {
+                const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, subjectIds }), credentials: 'include' });
+                if (res.ok) { resetTeacherForm(); loadTeachers(); } else { alert("Fehler."); }
+            } catch (e) { alert("Serverfehler"); }
+        }
+
+        async function deleteTeacher(id) {
+            if (!confirm("Wirklich löschen?")) return;
+            try {
+                const res = await fetch(API_URL + '/api/school/admin/teachers/' + id, { method: 'DELETE', credentials: 'include' });
+                if (res.ok) loadTeachers(); else alert("Fehler.");
+            } catch (e) { alert("Serverfehler"); }
+        }
+
+        // Admin Subjects
+        function renderSubjectList() {
+            const list = document.getElementById('subject-list'); list.innerHTML = '';
+            const sorted = [...subjectsData].sort((a, b) => { if (a.type === b.type) return a.label.localeCompare(b.label); return a.type === 'pflicht' ? -1 : 1; });
+            sorted.forEach(s => {
+                const isPflicht = s.type === 'pflicht';
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 p-4 border border-slate-200 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide ${isPflicht ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}">${isPflicht ? 'PFL' : 'WAHL'}</span>
+                            <span class="font-bold text-slate-700 truncate" title="${s.label}">${s.label}</span>
+                        </div>
+                        <button onclick="deleteSubject('${s.id}')" class="text-slate-400 hover:text-red-500 transition px-2">🗑️</button>
+                    </div>`;
+            });
+        }
+
+        async function addSubject() {
+            const label = document.getElementById('new-subject-label').value;
+            const type = document.getElementById('new-subject-type').value;
+            if (!label.trim()) return alert("Name fehlt");
+            try {
+                const res = await fetch(API_URL + '/api/school/admin/subjects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label, type }), credentials: 'include' });
+                if (res.ok) { document.getElementById('new-subject-label').value = ''; await loadSubjects(); renderSubjectList(); } else { alert("Fehler."); }
+            } catch (e) { }
+        }
+
+        async function deleteSubject(id) {
+            if (!confirm("Wirklich löschen?")) return;
+            try {
+                const res = await fetch(API_URL + '/api/school/admin/subjects/' + id, { method: 'DELETE', credentials: 'include' });
+                if (res.ok) { await loadSubjects(); renderSubjectList(); }
+            } catch (e) { }
+        }
+
+        // *** CANVAS GENERATOR ***
+        function generateCertificate(id) {
+            const t = teachersData.find(x => x._id === id);
+            drawCanvas(t, false);
+        }
+
+        function generateSchoolCertificate() {
+            const schoolAverages = {};
+            const counts = {};
+            teachersData.forEach(t => {
+                if (!t.averages) return;
+                Object.keys(t.averages).forEach(subId => {
+                    const val = t.averages[subId];
+                    if (val) {
+                        if (!schoolAverages[subId]) { schoolAverages[subId] = 0; counts[subId] = 0; }
+                        schoolAverages[subId] += val; counts[subId]++;
+                    }
+                });
+            });
+            const finalAverages = {};
+            Object.keys(schoolAverages).forEach(subId => { if (counts[subId] > 0) finalAverages[subId] = schoolAverages[subId] / counts[subId]; });
+            const schoolObj = { _id: 'school-global', name: "GESAMTSCHULE", averages: finalAverages, subjectIds: Object.keys(finalAverages) };
+            drawCanvas(schoolObj, true);
+        }
+
+        function drawCanvas(data, isSchool) {
+            const cvs = document.getElementById('cert-canvas');
+            const ctx = cvs.getContext('2d');
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+            ctx.fillStyle = "#000000"; ctx.textAlign = "center";
+            ctx.font = "bold 16px 'Segoe UI', Arial, sans-serif"; ctx.fillText("Anne Frank Realschule Ahaus", cvs.width / 2, 45);
+            ctx.font = "12px 'Segoe UI', Arial, sans-serif"; ctx.fillText("Staatliche Realschule", cvs.width / 2, 65);
+
+            const curY = new Date().getFullYear(); const nextY = (curY + 1).toString().substr(2);
+            ctx.textAlign = "left"; ctx.font = "13px 'Segoe UI', Arial, sans-serif"; ctx.fillText(`Schuljahr ${curY}/${nextY}`, 60, 90);
+            ctx.textAlign = "right"; ctx.fillText("Jahrgangsstufe 10", cvs.width - 60, 90);
+
+            ctx.textAlign = "center"; ctx.font = "bold 14px 'Segoe UI', Arial, sans-serif"; ctx.fillText("Mittlere - Reife - Zug", cvs.width / 2, 125);
+            ctx.font = "bold 28px 'Segoe UI', Arial, sans-serif"; ctx.fillText(isSchool ? "SCHUL-GESAMTZEUGNIS" : "LEHRERZEUGNIS", cvs.width / 2, 160);
+            ctx.font = "italic 16px 'Segoe UI', Arial, sans-serif"; ctx.fillText("für", cvs.width / 2, 185);
+            ctx.font = "bold 24px 'Segoe UI', Arial, sans-serif"; ctx.fillText(isSchool ? "Das gesamte Kollegium" : data.name, cvs.width / 2, 220);
+
+            ctx.beginPath(); ctx.moveTo(60, 240); ctx.lineTo(cvs.width - 60, 240); ctx.strokeStyle = "#333"; ctx.lineWidth = 2; ctx.stroke();
+
+            let y = 300; const xLabel = 70; const xGrade = 450; const avgs = data.averages || {};
+            ctx.textAlign = "left"; ctx.font = "15px 'Segoe UI', Arial, sans-serif"; ctx.lineWidth = 1;
+
+            const relevantSubjects = subjectsData.filter(s => (data.subjectIds || []).includes(s.id));
+            relevantSubjects.sort((a, b) => { if (a.type === 'pflicht' && b.type !== 'pflicht') return -1; if (a.type !== 'pflicht' && b.type === 'pflicht') return 1; return a.label.localeCompare(b.label); });
+
+            if (relevantSubjects.length === 0) { ctx.fillStyle = "#999"; ctx.textAlign = "center"; ctx.fillText("Keine Daten vorhanden.", cvs.width / 2, y + 20); }
+
+            let lastType = 'pflicht';
+            relevantSubjects.forEach(sub => {
+                if (sub.type !== lastType) {
+                    y += 25; ctx.font = "italic bold 13px 'Segoe UI', Arial, sans-serif"; ctx.fillStyle = "#666"; ctx.fillText("Wahlpflichtfächer / Weitere", xLabel, y - 10);
+                    ctx.font = "15px 'Segoe UI', Arial, sans-serif"; ctx.fillStyle = "#000"; lastType = sub.type;
+                }
+                const gradeVal = avgs[sub.id] ? avgs[sub.id].toFixed(2) : "---";
+                const hasGrade = !!avgs[sub.id];
+                ctx.fillStyle = "#000"; ctx.textAlign = "left"; ctx.fillText(sub.label, xLabel, y);
+
+                if (hasGrade) {
+                    if (avgs[sub.id] < 2.5) ctx.fillStyle = "#dcfce7";
+                    else if (avgs[sub.id] > 4.5) ctx.fillStyle = "#fee2e2";
+                    else ctx.fillStyle = "#f3f4f6";
+                } else {
+                    ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#e5e7eb"; ctx.strokeRect(xGrade, y - 18, 70, 24);
+                }
+                if (hasGrade) ctx.fillRect(xGrade, y - 18, 70, 24);
+
+                ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.font = "bold 15px 'Courier New', monospace"; ctx.fillText(gradeVal, xGrade + 35, y - 1);
+                ctx.font = "15px 'Segoe UI', Arial, sans-serif";
+
+                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(xLabel + ctx.measureText(sub.label).width + 10, y - 5); ctx.lineTo(xGrade - 10, y - 5); ctx.strokeStyle = "#ccc"; ctx.stroke(); ctx.setLineDash([]);
+                y += 35;
+            });
+
+            y = 760; ctx.textAlign = "center"; ctx.font = "12px 'Segoe UI', Arial, sans-serif";
+            ctx.beginPath(); ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.moveTo(60, y); ctx.lineTo(260, y); ctx.moveTo(335, y); ctx.lineTo(535, y); ctx.stroke();
+            ctx.fillText(new Date().toLocaleDateString('de-DE'), 160, y - 10); ctx.fillText(isSchool ? "Schülersprecher" : "Schulleitung", 160, y + 18); ctx.fillText(isSchool ? "Elternbeirat" : "Schülervertretung", 435, y + 18);
+            ctx.fillStyle = "#9ca3af"; ctx.font = "10px sans-serif"; ctx.fillText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, cvs.width / 2, 820);
+
+            const link = document.getElementById('download-link'); link.href = cvs.toDataURL("image/png");
+            showView('view-certificate');
+        }
+
+        checkAuth();
+    </script>
+</body>
+
+</html>
