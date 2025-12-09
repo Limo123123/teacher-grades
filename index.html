@@ -305,6 +305,7 @@
     </div>
 
     <script>
+        // *** CONFIG ***
         const API_URL = 'https://api.limazon.v6.rocks';
 
         let currentUser = null;
@@ -313,7 +314,7 @@
 
         // PAGINATION & FILTER STATE
         let currentPage = 1;
-        const itemsPerPage = 12; // 3x4 Grid oder 2x6
+        const itemsPerPage = 12;
         let currentFilter = "";
 
         // *** AUTHENTICATION ***
@@ -406,7 +407,7 @@
 
         function handleSearch() {
             currentFilter = document.getElementById('search-input').value.toLowerCase();
-            currentPage = 1; // Bei neuer Suche immer auf Seite 1 springen
+            currentPage = 1;
             renderTeachers();
         }
 
@@ -417,10 +418,7 @@
 
         function jumpToPage() {
             const val = parseInt(document.getElementById('page-input').value);
-            if (val > 0) {
-                currentPage = val;
-                renderTeachers();
-            }
+            if (val > 0) { currentPage = val; renderTeachers(); }
         }
 
         // *** RENDER DASHBOARD ***
@@ -428,10 +426,8 @@
             const list = document.getElementById('teacher-list');
             list.innerHTML = '';
 
-            // 1. Filtern
             let filtered = teachersData.filter(t => t.name.toLowerCase().includes(currentFilter));
 
-            // 2. Paginierung Berechnen
             const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
@@ -440,17 +436,14 @@
             const endIndex = startIndex + itemsPerPage;
             const pageItems = filtered.slice(startIndex, endIndex);
 
-            // 3. UI Updates für Paginierung
             document.getElementById('total-pages').innerText = totalPages;
             document.getElementById('page-input').value = currentPage;
             document.getElementById('btn-prev').disabled = currentPage === 1;
             document.getElementById('btn-next').disabled = currentPage === totalPages;
 
             const pagControls = document.getElementById('pagination-controls');
-            if (filtered.length > 0) pagControls.classList.remove('hidden');
-            else pagControls.classList.add('hidden');
+            if (filtered.length > 0) pagControls.classList.remove('hidden'); else pagControls.classList.add('hidden');
 
-            // 4. Render Items
             if (filtered.length === 0) {
                 list.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-xl shadow border border-slate-200 text-slate-500">Keine Lehrer gefunden.</div>`;
                 return;
@@ -494,8 +487,7 @@
 
         // *** RATING ***
         function openRateView(id) {
-            const t = teachersData.find(x => x._id === id);
-            if (!t) return;
+            const t = teachersData.find(x => x._id === id); if (!t) return;
             document.getElementById('rate-teacher-name').innerText = t.name;
             document.getElementById('rate-teacher-id').value = id;
             document.getElementById('rate-avatar').innerText = t.name.substring(0, 2).toUpperCase();
@@ -571,7 +563,6 @@
             }
         }
 
-        // Admin Teachers
         function renderTeacherCreationFormSubjects() {
             const container = document.getElementById('teacher-subject-select');
             container.innerHTML = '';
@@ -658,7 +649,6 @@
             } catch (e) { alert("Serverfehler"); }
         }
 
-        // Admin Subjects
         function renderSubjectList() {
             const list = document.getElementById('subject-list'); list.innerHTML = '';
             const sorted = [...subjectsData].sort((a, b) => { if (a.type === b.type) return a.label.localeCompare(b.label); return a.type === 'pflicht' ? -1 : 1; });
@@ -714,69 +704,169 @@
             });
             const finalAverages = {};
             Object.keys(schoolAverages).forEach(subId => { if (counts[subId] > 0) finalAverages[subId] = schoolAverages[subId] / counts[subId]; });
-            const schoolObj = { _id: 'school-global', name: "GESAMTSCHULE", averages: finalAverages, subjectIds: Object.keys(finalAverages) };
+            const schoolObj = { _id: 'school-global', name: "Das gesamte Kollegium", averages: finalAverages, subjectIds: Object.keys(finalAverages) };
             drawCanvas(schoolObj, true);
         }
+
+        // *** CANVAS GENERATOR ***
+        // ... generateCertificate und generateSchoolCertificate bleiben gleich ...
 
         function drawCanvas(data, isSchool) {
             const cvs = document.getElementById('cert-canvas');
             const ctx = cvs.getContext('2d');
-            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, cvs.width, cvs.height);
 
+            // --- High-DPI Scaling Fix (NEU) ---
+            // Ermittle die Pixeldichte des Geräts (z.B. 2 für Retina)
+            const dpr = window.devicePixelRatio || 1;
+            
+            // Die gewünschte logische Größe (A4-ähnlich)
+            const logicalWidth = 595;
+            const logicalHeight = 842;
+
+            // Setze die interne Auflösung des Canvas hoch
+            cvs.width = logicalWidth * dpr;
+            cvs.height = logicalHeight * dpr;
+
+            // Zwinge die Anzeige per CSS wieder auf die logische Größe
+            cvs.style.width = `${logicalWidth}px`;
+            cvs.style.height = `${logicalHeight}px`;
+
+            // Skaliere den Zeichenkontext, damit alle folgenden Koordinaten automatisch angepasst werden
+            // WICHTIG: Reset Transform zuerst, falls die Funktion mehrmals aufgerufen wird
+            ctx.setTransform(1, 0, 0, 1, 0, 0); 
+            ctx.scale(dpr, dpr);
+            // ----------------------------------
+            
+            // Reset Hintergrund (nutze logische Maße)
+            ctx.fillStyle = "#ffffff"; 
+            ctx.fillRect(0,0, logicalWidth, logicalHeight);
+            
+            // Fonts & Co definieren (Ab hier alles wie vorher)
+            const fontBold = "bold 14px Arial, sans-serif";
+            const fontNormal = "12px Arial, sans-serif";
+            const fontTitle = "bold 20px Arial, sans-serif";
+
+            // --- Header ---
             ctx.fillStyle = "#000000"; ctx.textAlign = "center";
-            ctx.font = "bold 16px 'Segoe UI', Arial, sans-serif"; ctx.fillText("Anne Frank Realschule Ahaus", cvs.width / 2, 45);
-            ctx.font = "12px 'Segoe UI', Arial, sans-serif"; ctx.fillText("Staatliche Realschule", cvs.width / 2, 65);
+            ctx.font = fontBold; 
+            // Benutze logicalWidth statt cvs.width/dpr für die Mitte
+            ctx.fillText("Anne Frank Realschule Ahaus", logicalWidth/2, 40);
+            ctx.font = fontNormal; 
+            ctx.fillText("Staatliche Realschule", logicalWidth/2, 58);
+            
+            const curY = new Date().getFullYear(); 
+            const nextY = (curY+1).toString().substr(2);
+            
+            ctx.textAlign = "left"; 
+            ctx.fillText(`Schuljahr ${curY}/${nextY}`, 50, 85);
+            ctx.textAlign = "right"; 
+            ctx.fillText("Jahrgangsstufe 10", logicalWidth-50, 85);
 
-            const curY = new Date().getFullYear(); const nextY = (curY + 1).toString().substr(2);
-            ctx.textAlign = "left"; ctx.font = "13px 'Segoe UI', Arial, sans-serif"; ctx.fillText(`Schuljahr ${curY}/${nextY}`, 60, 90);
-            ctx.textAlign = "right"; ctx.fillText("Jahrgangsstufe 10", cvs.width - 60, 90);
+            // --- Titel ---
+            ctx.textAlign = "center";
+            ctx.font = "bold 12px Arial, sans-serif"; 
+            ctx.fillText("Mittlere - Reife - Zug", logicalWidth/2, 120);
+            
+            ctx.font = "bold 26px Arial, sans-serif"; 
+            ctx.letterSpacing = "2px";
+            ctx.fillText(isSchool ? "SCHUL-GESAMTZEUGNIS" : "ZEUGNIS", logicalWidth/2, 155);
+            ctx.letterSpacing = "0px";
+            
+            ctx.font = "14px Arial, sans-serif"; 
+            ctx.fillText("für", logicalWidth/2, 180);
+            
+            ctx.font = "bold 20px Arial, sans-serif"; 
+            ctx.fillText(data.name, logicalWidth/2, 210);
+            
+            // Dicke Linie
+            ctx.beginPath(); ctx.moveTo(50, 230); ctx.lineTo(logicalWidth-50, 230); 
+            ctx.strokeStyle="#000"; ctx.lineWidth=1.5; ctx.stroke();
 
-            ctx.textAlign = "center"; ctx.font = "bold 14px 'Segoe UI', Arial, sans-serif"; ctx.fillText("Mittlere - Reife - Zug", cvs.width / 2, 125);
-            ctx.font = "bold 28px 'Segoe UI', Arial, sans-serif"; ctx.fillText(isSchool ? "SCHUL-GESAMTZEUGNIS" : "LEHRERZEUGNIS", cvs.width / 2, 160);
-            ctx.font = "italic 16px 'Segoe UI', Arial, sans-serif"; ctx.fillText("für", cvs.width / 2, 185);
-            ctx.font = "bold 24px 'Segoe UI', Arial, sans-serif"; ctx.fillText(isSchool ? "Das gesamte Kollegium" : data.name, cvs.width / 2, 220);
+            // --- Noten Grid Layout ---
+            let yStart = 280;
+            let rowHeight = 35;
+            
+            const col1X = 60;  const col1GradeX = 240;
+            const col2X = 320; const col2GradeX = 500;
 
-            ctx.beginPath(); ctx.moveTo(60, 240); ctx.lineTo(cvs.width - 60, 240); ctx.strokeStyle = "#333"; ctx.lineWidth = 2; ctx.stroke();
+            // Mapping: ID -> Position (1 = Links, 2 = Rechts)
+            const layoutMap = {
+                'rel': 1, 'deu': 1, 'mat': 1, 'eng': 1,
+                'phy': 2, 'che': 2, 'bio': 2, 'spo': 2, 'gse': 2, 'his': 2, 'pol': 2, 'geo': 2, 'awt': 2, 'mus': 2, 'art': 2
+            };
 
-            let y = 300; const xLabel = 70; const xGrade = 450; const avgs = data.averages || {};
-            ctx.textAlign = "left"; ctx.font = "15px 'Segoe UI', Arial, sans-serif"; ctx.lineWidth = 1;
+            const leftSubjects = [];
+            const rightSubjects = [];
+            const bottomSubjects = [];
 
-            const relevantSubjects = subjectsData.filter(s => (data.subjectIds || []).includes(s.id));
-            relevantSubjects.sort((a, b) => { if (a.type === 'pflicht' && b.type !== 'pflicht') return -1; if (a.type !== 'pflicht' && b.type === 'pflicht') return 1; return a.label.localeCompare(b.label); });
+            const avgs = data.averages || {};
+            const relevantSubjects = subjectsData.filter(s => (data.subjectIds||[]).includes(s.id));
 
-            if (relevantSubjects.length === 0) { ctx.fillStyle = "#999"; ctx.textAlign = "center"; ctx.fillText("Keine Daten vorhanden.", cvs.width / 2, y + 20); }
-
-            let lastType = 'pflicht';
-            relevantSubjects.forEach(sub => {
-                if (sub.type !== lastType) {
-                    y += 25; ctx.font = "italic bold 13px 'Segoe UI', Arial, sans-serif"; ctx.fillStyle = "#666"; ctx.fillText("Wahlpflichtfächer / Weitere", xLabel, y - 10);
-                    ctx.font = "15px 'Segoe UI', Arial, sans-serif"; ctx.fillStyle = "#000"; lastType = sub.type;
-                }
-                const gradeVal = avgs[sub.id] ? avgs[sub.id].toFixed(2) : "---";
-                const hasGrade = !!avgs[sub.id];
-                ctx.fillStyle = "#000"; ctx.textAlign = "left"; ctx.fillText(sub.label, xLabel, y);
-
-                if (hasGrade) {
-                    if (avgs[sub.id] < 2.5) ctx.fillStyle = "#dcfce7";
-                    else if (avgs[sub.id] > 4.5) ctx.fillStyle = "#fee2e2";
-                    else ctx.fillStyle = "#f3f4f6";
+            relevantSubjects.forEach(s => {
+                if(s.type === 'pflicht') {
+                    if(layoutMap[s.id] === 1) leftSubjects.push(s);
+                    else if(layoutMap[s.id] === 2) rightSubjects.push(s);
+                    else leftSubjects.push(s);
                 } else {
-                    ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#e5e7eb"; ctx.strokeRect(xGrade, y - 18, 70, 24);
+                    bottomSubjects.push(s);
                 }
-                if (hasGrade) ctx.fillRect(xGrade, y - 18, 70, 24);
-
-                ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.font = "bold 15px 'Courier New', monospace"; ctx.fillText(gradeVal, xGrade + 35, y - 1);
-                ctx.font = "15px 'Segoe UI', Arial, sans-serif";
-
-                ctx.beginPath(); ctx.setLineDash([2, 4]); ctx.moveTo(xLabel + ctx.measureText(sub.label).width + 10, y - 5); ctx.lineTo(xGrade - 10, y - 5); ctx.strokeStyle = "#ccc"; ctx.stroke(); ctx.setLineDash([]);
-                y += 35;
             });
 
-            y = 760; ctx.textAlign = "center"; ctx.font = "12px 'Segoe UI', Arial, sans-serif";
-            ctx.beginPath(); ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.moveTo(60, y); ctx.lineTo(260, y); ctx.moveTo(335, y); ctx.lineTo(535, y); ctx.stroke();
-            ctx.fillText(new Date().toLocaleDateString('de-DE'), 160, y - 10); ctx.fillText(isSchool ? "Schülersprecher" : "Schulleitung", 160, y + 18); ctx.fillText(isSchool ? "Elternbeirat" : "Schülervertretung", 435, y + 18);
-            ctx.fillStyle = "#9ca3af"; ctx.font = "10px sans-serif"; ctx.fillText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, cvs.width / 2, 820);
+            // Hilfsfunktion Zeile Zeichnen
+            function drawRow(sub, xTxt, xBox, yPos) {
+                const gradeVal = avgs[sub.id] ? avgs[sub.id].toFixed(2) : "---";
+                const hasGrade = !!avgs[sub.id];
 
+                ctx.textAlign = "left"; ctx.fillStyle = "#000"; ctx.font = "13px Arial, sans-serif";
+                ctx.fillText(sub.label, xTxt, yPos);
+
+                // Graue Box
+                ctx.fillStyle = "#e0e0e0"; if(!hasGrade) ctx.fillStyle = "#f5f5f5";
+                ctx.fillRect(xBox, yPos-14, 60, 20);
+
+                // Note
+                ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.font = "bold 13px Arial, sans-serif";
+                if(!hasGrade) ctx.fillStyle = "#999";
+                ctx.fillText(gradeVal, xBox+30, yPos);
+            }
+
+            // Zeichne Linke Spalte
+            let yL = yStart;
+            leftSubjects.forEach(s => { drawRow(s, col1X, col1GradeX, yL); yL += rowHeight; });
+
+            // Zeichne Rechte Spalte
+            let yR = yStart;
+            rightSubjects.forEach(s => { drawRow(s, col2X, col2GradeX, yR); yR += rowHeight; });
+
+            let yBottom = Math.max(yL, yR) + 20;
+
+            // Wahlpflicht Header
+            if(bottomSubjects.length > 0) {
+                ctx.textAlign = "left"; ctx.fillStyle = "#000";
+                ctx.font = "bold italic 12px Arial, sans-serif";
+                ctx.fillText("Wahlpflichtfächer / Weitere", col1X, yBottom);
+                yBottom += 25;
+                bottomSubjects.forEach(s => { drawRow(s, col2X, col2GradeX, yBottom); yBottom += rowHeight; });
+            }
+
+            // --- Footer ---
+            const dateStr = new Date().toLocaleDateString('de-DE');
+            let yFooter = 720;
+            
+            ctx.beginPath(); ctx.lineWidth=1; 
+            ctx.moveTo(50, yFooter); ctx.lineTo(250, yFooter); 
+            ctx.moveTo(345, yFooter); ctx.lineTo(545, yFooter); 
+            ctx.stroke();
+
+            ctx.textAlign = "center"; ctx.font = "11px Arial, sans-serif";
+            ctx.fillText(dateStr, 150, yFooter-10);
+            ctx.fillText(isSchool?"Schülersprecher":"Schulleiter", 150, yFooter+15);
+            ctx.fillText(isSchool?"Elternbeirat":"Klassenleiter", 445, yFooter+15);
+
+            // Tech Info
+            ctx.fillStyle = "#aaa"; ctx.font = "9px Arial, sans-serif"; 
+            ctx.fillText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, logicalWidth/2, 820);
+            
             const link = document.getElementById('download-link'); link.href = cvs.toDataURL("image/png");
             showView('view-certificate');
         }
