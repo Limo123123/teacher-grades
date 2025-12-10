@@ -4,41 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anne Frank RS - Lehrer Bewertung</title>
+    <title>HUMAN GRADES</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
         }
 
         .canvas-container {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
         .hidden {
             display: none;
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
         .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes fadeIn {
@@ -52,270 +35,279 @@
                 transform: translateY(0);
             }
         }
+
+        /* Branding Colors */
+        .brand-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
     </style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Courier+Prime:wght@700&family=Dancing+Script:wght@700&family=Merriweather:wght@700&display=swap"
+        rel="stylesheet">
 </head>
 
-<body class="text-slate-800 bg-slate-100 min-h-screen flex flex-col">
+<body class="text-slate-800 bg-slate-100 min-h-screen flex flex-col font-sans">
 
-    <nav class="bg-white text-slate-800 p-4 shadow-sm sticky top-0 z-50 border-b border-slate-200">
+    <nav class="brand-gradient text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3 cursor-pointer" onclick="showDashboard()">
                 <div
-                    class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg">
-                    🎓</div>
+                    class="w-10 h-10 bg-white text-slate-900 rounded-lg flex items-center justify-center text-xl font-bold shadow">
+                    HG</div>
                 <div>
-                    <h1 class="text-lg font-bold leading-tight text-slate-900">Anne Frank Realschule</h1>
-                    <p class="text-xs text-slate-500 font-medium tracking-wide">LEHRER BEWERTUNG</p>
+                    <h1 class="text-lg font-extrabold tracking-tighter">HUMAN GRADES</h1>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Universal Rating System</p>
                 </div>
             </div>
 
             <div id="nav-auth" class="space-x-4 hidden flex items-center">
                 <span id="user-display"
-                    class="font-semibold bg-slate-100 px-3 py-1 rounded text-sm border border-slate-200"></span>
-                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700 font-medium">Abmelden</button>
+                    class="font-semibold bg-white/10 px-3 py-1 rounded text-sm border border-white/10"></span>
+                <button onclick="logout()" class="text-sm text-slate-300 hover:text-white font-medium">Logout</button>
             </div>
             <div id="nav-login">
                 <button onclick="showLogin()"
-                    class="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold shadow-md hover:bg-indigo-700 transition text-sm">Anmelden</button>
+                    class="bg-white text-slate-900 px-5 py-2 rounded-full font-bold shadow hover:bg-slate-100 transition text-sm">Login</button>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto p-4 mt-6 max-w-6xl flex-grow">
+    <div class="container mx-auto p-4 mt-6 max-w-7xl flex-grow">
 
         <div id="view-login"
-            class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl hidden mt-10 border border-slate-100 fade-in">
-            <h2 class="text-3xl font-bold mb-2 text-center text-slate-800">Willkommen</h2>
-            <p class="text-center text-slate-500 mb-8">Bitte melde dich mit deiner LimoID an.</p>
+            class="max-w-md mx-auto bg-white p-10 rounded-3xl shadow-xl hidden mt-10 border border-slate-100 fade-in">
+            <h2 class="text-3xl font-extrabold mb-2 text-center text-slate-900">Identifizierung</h2>
+            <p class="text-center text-slate-500 mb-8">Zugang nur mit verifizierter LimoID.</p>
             <form onsubmit="login(event)">
                 <div class="mb-5">
-                    <label
-                        class="block text-slate-700 text-xs font-bold mb-2 uppercase tracking-wider">Benutzername</label>
+                    <label class="block text-slate-500 text-xs font-bold mb-2 uppercase tracking-wider">Limo ID</label>
                     <input type="text" id="login-user"
-                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-slate-800 transition"
                         required>
                 </div>
                 <div class="mb-8">
-                    <label class="block text-slate-700 text-xs font-bold mb-2 uppercase tracking-wider">Passwort</label>
+                    <label class="block text-slate-500 text-xs font-bold mb-2 uppercase tracking-wider">Passcode</label>
                     <input type="password" id="login-pass"
-                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-slate-800 transition"
                         required>
                 </div>
-                <button type="submit"
-                    class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 transition transform active:scale-[0.98] shadow-lg shadow-indigo-200">Einloggen</button>
+                <div class="flex gap-3">
+                    <button type="button" onclick="showDashboard()"
+                        class="flex-1 bg-slate-100 text-slate-600 p-4 rounded-xl font-bold hover:bg-slate-200 transition">Als
+                        Gast weiter</button>
+                    <button type="submit"
+                        class="flex-1 bg-slate-900 text-white p-4 rounded-xl font-bold hover:bg-black transition shadow-lg">Verbinden</button>
+                </div>
             </form>
             <p id="login-error" class="text-red-500 mt-6 text-center text-sm font-medium"></p>
         </div>
 
         <div id="view-dashboard" class="hidden fade-in">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Lehrerkollegium</h2>
-                        <p class="text-slate-500 text-sm">Finde Lehrer, bewerte sie und erstelle Zeugnisse.</p>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6 sticky top-20 z-40">
+                <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+
+                    <div id="category-tabs"
+                        class="flex gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-hide">
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <div class="relative w-full md:w-64">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </span>
-                            <input type="text" id="search-input" oninput="handleSearch()" placeholder="Lehrer suchen..."
-                                class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                        </div>
+                    <div class="flex gap-3 w-full lg:w-auto">
+                        <input type="text" id="search-input" oninput="handleSearch()" placeholder="Namen suchen..."
+                            class="w-full lg:w-64 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-slate-900 shadow-inner bg-slate-50">
 
-                        <button onclick="generateSchoolCertificate()"
-                            class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition shadow flex items-center justify-center gap-2 font-bold text-sm whitespace-nowrap">
-                            <span>🏫</span> Schulzeugnis
+                        <button onclick="generateCategoryCertificate()"
+                            class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg hover:bg-amber-500 transition shadow font-bold text-sm whitespace-nowrap flex items-center gap-2">
+                            <span>📜</span> <span id="btn-group-cert-text">Gesamt-Zeugnis</span>
                         </button>
 
                         <button id="admin-btn" onclick="showAdminPanel()"
-                            class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900 transition hidden shadow flex items-center justify-center gap-2 font-bold text-sm">
-                            <span>⚙️</span>
-                        </button>
+                            class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900 transition hidden shadow">⚙️</button>
                     </div>
                 </div>
             </div>
 
-            <div id="teacher-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div class="col-span-full text-center py-20 text-gray-400 flex flex-col items-center">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-2"></div>
-                    Lade Daten...
-                </div>
+            <div id="human-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             </div>
 
             <div id="pagination-controls"
-                class="flex justify-center items-center gap-4 hidden bg-white p-4 rounded-xl shadow-sm border border-slate-200 w-fit mx-auto">
+                class="flex justify-center items-center gap-4 hidden bg-white p-3 rounded-xl shadow-sm border border-slate-200 w-fit mx-auto mt-8">
                 <button onclick="changePage(-1)" id="btn-prev"
-                    class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition">
-                    &larr; Zurück
-                </button>
-
-                <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
-                    Seite
-                    <input type="number" id="page-input" min="1"
-                        class="w-16 border p-1 text-center rounded focus:ring-indigo-500 focus:border-indigo-500"
-                        onchange="jumpToPage()">
-                    von <span id="total-pages">1</span>
-                </div>
-
+                    class="text-slate-500 hover:text-slate-900 disabled:opacity-30 font-bold px-4 py-2 rounded hover:bg-slate-100 transition">&larr;
+                    Zurück</button>
+                <span class="text-sm font-bold text-slate-700">Seite <span id="current-page-disp">1</span> / <span
+                        id="total-pages">1</span></span>
                 <button onclick="changePage(1)" id="btn-next"
-                    class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition">
-                    Vor &rarr;
-                </button>
+                    class="text-slate-500 hover:text-slate-900 disabled:opacity-30 font-bold px-4 py-2 rounded hover:bg-slate-100 transition">Vor
+                    &rarr;</button>
             </div>
         </div>
 
-        <div id="view-rate" class="hidden max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-xl fade-in mt-4">
-            <div class="flex items-center justify-between mb-6 border-b pb-4">
-                <h2 class="text-2xl font-bold text-slate-800">Bewertung abgeben</h2>
+        <div id="view-rate"
+            class="hidden max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-2xl fade-in mt-4 border border-slate-100">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-extrabold text-slate-900">Bewertung</h2>
                 <button onclick="showDashboard()"
-                    class="text-slate-500 hover:text-indigo-600 font-semibold text-sm transition">✕ Abbrechen</button>
+                    class="text-sm font-bold text-slate-400 hover:text-slate-900 transition">ABBRECHEN</button>
             </div>
 
-            <div class="flex items-center gap-4 mb-8 bg-indigo-50 p-4 rounded-xl">
-                <div class="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-700 text-xl font-bold shadow-inner"
-                    id="rate-avatar">?</div>
-                <div>
-                    <p class="text-sm text-indigo-600 font-bold uppercase tracking-wider">Lehrer/in</p>
-                    <p class="text-xl font-bold text-slate-800" id="rate-teacher-name"></p>
-                </div>
+            <div class="text-center mb-8 bg-slate-50 p-6 rounded-xl border border-slate-100">
+                <div class="w-20 h-20 bg-slate-900 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-lg ring-4 ring-white"
+                    id="rate-avatar"></div>
+                <h3 class="text-2xl font-bold text-slate-800" id="rate-human-name"></h3>
+                <span
+                    class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-1 rounded uppercase tracking-widest mt-2 inline-block"
+                    id="rate-human-cat"></span>
             </div>
-
-            <p class="text-sm text-slate-500 mb-6 bg-yellow-50 p-3 rounded border border-yellow-100">
-                ℹ️ <strong>Hinweis:</strong> Wenn du ein Fach bei diesem Lehrer nicht hast, wähle bitte das
-                <strong>"X"</strong> (ganz rechts).
-            </p>
 
             <form id="rating-form" onsubmit="submitRating(event)">
-                <input type="hidden" id="rate-teacher-id">
-                <div class="space-y-3" id="rating-inputs">
-                </div>
-                <div class="mt-8 pt-6 border-t flex justify-end gap-3">
-                    <button type="button" onclick="showDashboard()"
-                        class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">Abbrechen</button>
-                    <button type="submit"
-                        class="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 transform active:scale-95">Bewertung
-                        speichern</button>
-                </div>
+                <input type="hidden" id="rate-human-id">
+                <div class="space-y-3" id="rating-inputs"></div>
+
+                <button type="submit"
+                    class="mt-8 w-full bg-slate-900 text-white p-4 rounded-xl font-bold hover:bg-black transition shadow-lg text-lg">Bewertung
+                    speichern</button>
             </form>
         </div>
 
-        <div id="view-certificate" class="hidden flex flex-col items-center fade-in">
-            <div class="w-full max-w-2xl flex justify-between items-center mb-6">
-                <button onclick="showDashboard()"
-                    class="text-indigo-600 font-bold hover:underline flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
-                    <span>&larr;</span> Zurück
-                </button>
-                <a id="download-link"
-                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 cursor-pointer shadow-lg flex items-center gap-2 font-bold"
-                    download="zeugnis.png">
-                    <span>📥</span> Bild speichern
-                </a>
+        <div id="view-certificate"
+            class="hidden flex flex-col items-center fade-in bg-slate-800/50 p-4 rounded-xl min-h-screen fixed inset-0 z-50 overflow-y-auto">
+            <div class="bg-white p-6 rounded-xl shadow-2xl max-w-4xl w-full my-10">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 class="text-2xl font-bold text-slate-800">Zertifikat erstellt</h2>
+                    <button onclick="showDashboard()"
+                        class="text-slate-500 hover:text-slate-800 font-bold px-3 py-1 rounded hover:bg-slate-100 transition">✕
+                        Schließen</button>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 flex justify-center bg-slate-100 p-4 rounded-lg border border-slate-200">
+                        <canvas id="cert-canvas" width="595" height="842"
+                            class="bg-white shadow-md max-w-full h-auto"></canvas>
+                    </div>
+
+                    <div class="w-full md:w-64 flex flex-col gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800">
+                            <strong>Fertig!</strong><br>
+                            Wähle dein Format:
+                        </div>
+
+                        <button onclick="downloadPNG()"
+                            class="bg-indigo-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-indigo-700 transition shadow flex items-center justify-center gap-2">
+                            <span>🖼️</span> PNG Bild
+                        </button>
+
+                        <button onclick="downloadSVG()"
+                            class="bg-emerald-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-emerald-700 transition shadow flex items-center justify-center gap-2">
+                            <span>⚡</span> SVG Vektor
+                        </button>
+
+                        <hr class="border-slate-200 my-2">
+                        <p class="text-xs text-slate-400 text-center">Unterschrieben von der Limo Organisation</p>
+                    </div>
+                </div>
             </div>
-            <div class="bg-white p-2 rounded shadow-2xl overflow-hidden">
-                <canvas id="cert-canvas" width="595" height="842" class="bg-white"></canvas>
-            </div>
-            <p class="mt-6 text-sm text-gray-400 text-center max-w-lg">Dieses Dokument wurde automatisch generiert
-                basierend auf den abgegebenen Bewertungen der Schüler.</p>
         </div>
 
         <div id="view-admin"
             class="hidden bg-white p-6 rounded-2xl shadow-xl min-h-[600px] border border-slate-200 fade-in">
-            <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-800">
-                    <span>⚙️</span> Schul-Verwaltung
-                </h2>
+            <div class="flex justify-between mb-6 border-b pb-4">
+                <h2 class="text-2xl font-extrabold text-slate-900">System Verwaltung</h2>
                 <button onclick="showDashboard()"
-                    class="text-slate-400 hover:text-slate-800 font-bold px-3 py-1 rounded hover:bg-slate-100 transition">Schließen
-                    ✕</button>
+                    class="text-slate-400 font-bold hover:text-slate-900 bg-slate-100 px-3 py-1 rounded">✕
+                    Schließen</button>
             </div>
 
-            <div class="flex space-x-2 mb-6 border-b">
-                <button onclick="switchAdminTab('teachers')" id="tab-btn-teachers"
-                    class="px-6 py-3 rounded-t-lg font-bold border-b-2 transition-colors">Lehrer</button>
-                <button onclick="switchAdminTab('subjects')" id="tab-btn-subjects"
-                    class="px-6 py-3 rounded-t-lg font-bold border-b-2 transition-colors">Fächer</button>
+            <div class="flex gap-4 mb-6 border-b pb-4 overflow-x-auto">
+                <button onclick="switchAdminView('humans')" id="adm-btn-humans"
+                    class="font-bold text-slate-900 border-b-2 border-slate-900 pb-1 whitespace-nowrap">Menschen</button>
+                <button onclick="switchAdminView('moderation')" id="adm-btn-moderation"
+                    class="font-bold text-slate-500 hover:text-slate-900 pb-1 text-red-600 whitespace-nowrap">🛡️
+                    Moderation</button>
+                <button onclick="switchAdminView('criteria')" id="adm-btn-criteria"
+                    class="font-bold text-slate-500 hover:text-slate-900 pb-1 whitespace-nowrap">Kriterien</button>
+                <button onclick="switchAdminView('categories')" id="adm-btn-categories"
+                    class="font-bold text-slate-500 hover:text-slate-900 pb-1 whitespace-nowrap">Kategorien</button>
+                <button onclick="resetDefaults()"
+                    class="font-bold text-red-500 hover:text-red-700 ml-auto whitespace-nowrap text-xs border border-red-200 px-3 py-1 rounded bg-red-50">⚠️
+                    DB Reset</button>
             </div>
 
-            <div id="admin-tab-teachers" class="hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-1 bg-slate-50 p-5 rounded-xl border border-slate-200 h-fit sticky top-4">
-                        <h3 class="font-bold text-lg mb-4 text-indigo-700" id="teacher-form-title">Neuen Lehrer
-                            hinzufügen</h3>
-                        <input type="hidden" id="edit-teacher-id">
-
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Name</label>
-                            <input type="text" id="new-teacher-name" placeholder="z.B. Herr Müller"
-                                class="w-full border border-slate-300 p-2 rounded focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Unterrichtet:</label>
-                            <div id="teacher-subject-select"
-                                class="grid grid-cols-1 gap-2 text-sm max-h-60 overflow-y-auto p-2 border border-slate-200 bg-white rounded shadow-inner">
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <button onclick="saveTeacher()" id="save-teacher-btn"
-                                class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition shadow">Erstellen</button>
-                            <button onclick="resetTeacherForm()" id="cancel-edit-btn"
-                                class="bg-white border border-slate-300 text-slate-600 px-3 py-2 rounded-lg font-bold hover:bg-slate-50 transition hidden">Abbr.</button>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-2">
-                        <h3 class="font-bold text-lg mb-4 text-slate-700 flex justify-between items-center">
-                            Aktuelles Kollegium
-                            <span class="text-xs bg-slate-200 px-2 py-1 rounded text-slate-600"
-                                id="admin-teacher-count">0</span>
-                        </h3>
-                        <div id="admin-teacher-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="admin-tab-subjects" class="hidden">
-                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 mb-8">
-                    <h3 class="font-bold text-lg mb-4 text-blue-800">Neues Fach anlegen</h3>
-                    <div class="flex flex-col md:flex-row gap-3">
-                        <input type="text" id="new-subject-label" placeholder="Fach Name (z.B. Informatik)"
-                            class="border p-3 rounded-lg flex-1 shadow-sm">
-                        <select id="new-subject-type" class="border p-3 rounded-lg bg-white shadow-sm cursor-pointer">
-                            <option value="pflicht">Pflichtfach</option>
-                            <option value="wahl">Wahlpflichtfach</option>
-                        </select>
-                        <button onclick="addSubject()"
-                            class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">Hinzufügen</button>
-                    </div>
-                </div>
-
-                <h3 class="font-bold mb-3 text-slate-700">Verfügbare Schulfächer:</h3>
-                <div id="subject-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                </div>
+            <div id="admin-content" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             </div>
         </div>
 
     </div>
 
     <script>
-        // *** CONFIG ***
         const API_URL = 'https://api.limazon.v6.rocks';
 
         let currentUser = null;
-        let teachersData = [];
-        let subjectsData = [];
+        let humansData = [];
+        let criteriaData = [];
+        let categoriesData = [];
 
-        // PAGINATION & FILTER STATE
+        // State
         let currentPage = 1;
         const itemsPerPage = 12;
+        let activeCategory = "all";
         let currentFilter = "";
+        let currentAdminView = "humans";
+        let adminRatersCache = [];
+
+        // Export State
+        let currentSvgContent = "";
+        let currentCertFileName = "Zeugnis";
+
+        // *** HELPER FUNCTIONS ***
+        function showView(id) {
+            ['view-login', 'view-dashboard', 'view-rate', 'view-certificate', 'view-admin'].forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(id);
+            if (target) target.classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            showView('view-dashboard');
+            renderHumans();
+        }
+
+        function showLogin() {
+            showView('view-login');
+        }
+
+        function updateUI(isLoggedIn) {
+            const navLogin = document.getElementById('nav-login');
+            const navAuth = document.getElementById('nav-auth');
+            const viewLogin = document.getElementById('view-login');
+            const adminBtn = document.getElementById('admin-btn');
+            const userDisplay = document.getElementById('user-display');
+
+            if (isLoggedIn) {
+                navLogin.classList.add('hidden');
+                navAuth.classList.remove('hidden');
+                viewLogin.classList.add('hidden');
+                userDisplay.innerText = currentUser.username;
+                if (currentUser.isAdmin) adminBtn.classList.remove('hidden');
+
+                // Nur zum Dashboard wechseln, wenn wir nicht schon woanders sind (z.B. Admin)
+                if (document.getElementById('view-dashboard').classList.contains('hidden') &&
+                    document.getElementById('view-admin').classList.contains('hidden')) {
+                    showDashboard();
+                }
+            } else {
+                navLogin.classList.remove('hidden');
+                navAuth.classList.add('hidden');
+                adminBtn.classList.add('hidden');
+                // Wenn wir auf view-login sind, bleiben wir da. Sonst Dashboard (Public Mode)
+                if (!document.getElementById('view-login').classList.contains('hidden')) {
+                    // Do nothing
+                } else {
+                    showDashboard();
+                }
+            }
+        }
 
         // *** AUTHENTICATION ***
         async function checkAuth() {
@@ -324,18 +316,28 @@
                 if (res.ok) {
                     currentUser = await res.json();
                     updateUI(true);
-                    await loadSubjects();
-                    loadTeachers();
-                } else { updateUI(false); }
-            } catch (e) { updateUI(false); }
+                } else {
+                    currentUser = null;
+                    updateUI(false);
+                }
+                // Daten laden (immer)
+                await loadMetaData();
+                loadHumans();
+            } catch (e) {
+                console.error("Auth Check failed", e);
+                currentUser = null;
+                updateUI(false);
+                // Fallback Load
+                loadMetaData();
+                loadHumans();
+            }
         }
 
         async function login(e) {
-            if (e) e.preventDefault();
+            e.preventDefault();
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
             const err = document.getElementById('login-error');
-            err.innerText = "Lade...";
 
             try {
                 const res = await fetch(API_URL + '/api/auth/login', {
@@ -347,9 +349,11 @@
                     currentUser = data.user;
                     err.innerText = "";
                     updateUI(true);
-                    await loadSubjects();
-                    loadTeachers();
-                } else { err.innerText = "Falsche Daten."; }
+                    await loadMetaData();
+                    loadHumans();
+                } else {
+                    err.innerText = "Zugriff verweigert.";
+                }
             } catch (e) { err.innerText = "Netzwerkfehler."; }
         }
 
@@ -358,517 +362,547 @@
             window.location.reload();
         }
 
-        function updateUI(isLoggedIn) {
-            if (isLoggedIn) {
-                document.getElementById('nav-login').classList.add('hidden');
-                document.getElementById('nav-auth').classList.remove('hidden');
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('user-display').innerText = currentUser.username;
-                if (currentUser.isAdmin) document.getElementById('admin-btn').classList.remove('hidden');
-                if (document.getElementById('view-dashboard').classList.contains('hidden') &&
-                    document.getElementById('view-admin').classList.contains('hidden')) showDashboard();
-            } else {
-                document.getElementById('nav-login').classList.remove('hidden');
-                document.getElementById('nav-auth').classList.add('hidden');
-                showView('view-login');
-            }
-        }
-
         // *** DATA LOADING ***
-        async function loadSubjects() {
+        async function loadMetaData() {
             try {
-                const res = await fetch(API_URL + '/api/school/subjects', { credentials: 'include' });
-                if (res.ok) { const d = await res.json(); subjectsData = d.subjects; }
-            } catch (e) { }
+                const res = await fetch(API_URL + '/api/human/meta', { credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json();
+                    categoriesData = data.categories;
+                    criteriaData = data.criteria;
+                    console.log("Meta geladen:", categoriesData.length, "Cats", criteriaData.length, "Crits");
+                    renderCategoryTabs();
+                }
+            } catch (e) { console.error(e); }
         }
 
-        async function loadTeachers() {
+        async function loadHumans() {
             try {
-                const res = await fetch(API_URL + '/api/school/teachers', { credentials: 'include' });
+                const res = await fetch(API_URL + '/api/human/list', { credentials: 'include' });
                 if (res.ok) {
-                    const d = await res.json();
-                    teachersData = d.teachers;
-                    renderTeachers();
-                    if (!document.getElementById('view-admin').classList.contains('hidden') &&
-                        !document.getElementById('admin-tab-teachers').classList.contains('hidden')) {
-                        renderTeacherAdminList();
+                    const data = await res.json();
+                    humansData = data.humans;
+                    console.log("Humans geladen:", humansData.length);
+                    renderHumans();
+                    // Admin Refresh
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) {
+                        if (currentAdminView === 'humans') renderAdminHumans();
                     }
                 }
-            } catch (e) { }
+            } catch (e) { console.error(e); }
         }
 
-        // *** NAVIGATION & PAGINATION ***
-        function showView(id) {
-            ['view-login', 'view-dashboard', 'view-rate', 'view-certificate', 'view-admin'].forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
+        async function resetDefaults() {
+            if (!confirm("ACHTUNG: Dies löscht ALLE Kategorien und Kriterien und lädt die Standard-Daten neu!")) return;
+            const res = await fetch(API_URL + '/api/human/admin/reset-defaults', { method: 'POST', credentials: 'include' });
+            if (res.ok) { alert("Reset erfolgreich. Seite wird neu geladen."); window.location.reload(); }
         }
-        function showDashboard() { showView('view-dashboard'); renderTeachers(); }
-        function showLogin() { showView('view-login'); }
+
+        // *** DASHBOARD LOGIC ***
+        function renderCategoryTabs() {
+            const container = document.getElementById('category-tabs');
+            let html = `<button onclick="filterCategory('all')" class="cat-btn ${activeCategory === 'all' ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100'} px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition whitespace-nowrap border border-slate-200">Alle</button>`;
+
+            categoriesData.forEach(c => {
+                const isActive = activeCategory === c.id;
+                const cls = isActive ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-100';
+                html += `<button onclick="filterCategory('${c.id}')" class="cat-btn ${cls} px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition whitespace-nowrap border border-slate-200">${c.label}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function filterCategory(catId) {
+            activeCategory = catId;
+            currentPage = 1;
+            renderCategoryTabs();
+            renderHumans();
+
+            let label = "Gesamt-Zeugnis";
+            if (catId !== 'all') {
+                const catObj = categoriesData.find(c => c.id === catId);
+                if (catObj) label = catObj.label + " Gesamt-Zeugnis";
+            }
+            document.getElementById('btn-group-cert-text').innerText = label;
+        }
 
         function handleSearch() {
             currentFilter = document.getElementById('search-input').value.toLowerCase();
             currentPage = 1;
-            renderTeachers();
+            renderHumans();
         }
 
-        function changePage(delta) {
-            currentPage += delta;
-            renderTeachers();
-        }
-
-        function jumpToPage() {
-            const val = parseInt(document.getElementById('page-input').value);
-            if (val > 0) { currentPage = val; renderTeachers(); }
-        }
-
-        // *** RENDER DASHBOARD ***
-        function renderTeachers() {
-            const list = document.getElementById('teacher-list');
+        function renderHumans() {
+            const list = document.getElementById('human-list');
             list.innerHTML = '';
 
-            let filtered = teachersData.filter(t => t.name.toLowerCase().includes(currentFilter));
+            let filtered = humansData.filter(h => {
+                const matchCat = activeCategory === 'all' || h.categoryId === activeCategory;
+                const matchSearch = h.name.toLowerCase().includes(currentFilter);
+                return matchCat && matchSearch;
+            });
 
             const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
 
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageItems = filtered.slice(startIndex, endIndex);
-
+            document.getElementById('current-page-disp').innerText = currentPage;
             document.getElementById('total-pages').innerText = totalPages;
-            document.getElementById('page-input').value = currentPage;
-            document.getElementById('btn-prev').disabled = currentPage === 1;
-            document.getElementById('btn-next').disabled = currentPage === totalPages;
+            document.getElementById('pagination-controls').classList.toggle('hidden', filtered.length === 0);
 
-            const pagControls = document.getElementById('pagination-controls');
-            if (filtered.length > 0) pagControls.classList.remove('hidden'); else pagControls.classList.add('hidden');
+            const pageItems = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-            if (filtered.length === 0) {
-                list.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-xl shadow border border-slate-200 text-slate-500">Keine Lehrer gefunden.</div>`;
+            if (pageItems.length === 0) {
+                list.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400 font-bold flex flex-col items-center gap-2"><span class="text-4xl">🔍</span><br>Keine Personen gefunden.</div>`;
                 return;
             }
 
-            pageItems.forEach(t => {
-                const avg = t.totalAverage ? t.totalAverage.toFixed(2) : '-';
-                const mySubjects = (t.subjectIds || []).map(sid => subjectsData.find(s => s.id === sid)).filter(s => s);
-                const subBadges = mySubjects.slice(0, 4).map(s =>
-                    `<span class="text-[10px] uppercase font-bold tracking-wider bg-slate-100 px-2 py-1 rounded text-slate-600 border border-slate-200">${s.label.substring(0, 15)}</span>`
-                ).join('');
-                const moreText = mySubjects.length > 4 ? `<span class="text-xs text-gray-400 font-bold">+${mySubjects.length - 4}</span>` : '';
+            pageItems.forEach(h => {
+                const avg = h.totalAverage ? h.totalAverage.toFixed(2) : '-';
+                const catObj = categoriesData.find(c => c.id === h.categoryId);
+                const catLabel = catObj ? catObj.label : 'Unbekannt';
+
+                let catColor = 'text-slate-500';
+                if (h.categoryId === 'lehrer') catColor = 'text-indigo-500';
+                if (h.categoryId === 'politiker') catColor = 'text-amber-600';
+
+                // Guest Logic
+                const rateAction = currentUser ? `openRate('${h._id}')` : "showLogin()";
+                const rateBtnText = currentUser ? "BEWERTEN" : "LOGIN";
 
                 list.innerHTML += `
-                    <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition border border-slate-200 flex flex-col h-full hover:border-indigo-300 group">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                                    ${t.name.substring(0, 2).toUpperCase()}
-                                </div>
-                                <h3 class="text-lg font-bold text-slate-800 truncate pr-2 group-hover:text-indigo-700 transition">${t.name}</h3>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-slate-300 transition group flex flex-col h-full hover:shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-slate-50 rounded-bl-full -mr-10 -mt-10 transition group-hover:bg-slate-100"></div>
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-widest ${catColor} mb-1 block">${catLabel}</span>
+                                <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-500 transition line-clamp-1" title="${h.name}">${h.name}</h3>
                             </div>
-                            <div class="bg-slate-50 text-slate-700 font-bold px-3 py-1 rounded-lg border border-slate-200 whitespace-nowrap text-sm">
-                                Ø ${avg}
-                            </div>
+                            <div class="bg-slate-100 text-slate-900 font-bold px-3 py-1 rounded-lg text-sm border border-slate-200">${avg}</div>
                         </div>
-                        <div class="flex-grow">
-                            <div class="flex flex-wrap gap-1 mb-3 items-center min-h-[24px]">
-                                ${subBadges || '<span class="text-xs text-gray-400 italic">Keine Fächer</span>'} ${moreText}
-                            </div>
-                            <p class="text-slate-400 text-xs flex items-center gap-1 font-medium">📝 ${t.ratingCount || 0} Bewertungen</p>
+                        <div class="flex-grow relative z-10">
+                            <p class="text-xs text-slate-400 font-bold flex items-center gap-1"><span class="text-slate-300">●</span> ${h.ratingCount || 0} Bewertungen</p>
                         </div>
-                        <div class="flex gap-2 mt-5 pt-4 border-t border-slate-100">
-                            <button onclick="openRateView('${t._id}')" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">Bewerten</button>
-                            <button onclick="generateCertificate('${t._id}')" class="flex-1 bg-white border border-slate-200 text-slate-700 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 hover:text-indigo-600 transition">Zeugnis</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // *** RATING ***
-        function openRateView(id) {
-            const t = teachersData.find(x => x._id === id); if (!t) return;
-            document.getElementById('rate-teacher-name').innerText = t.name;
-            document.getElementById('rate-teacher-id').value = id;
-            document.getElementById('rate-avatar').innerText = t.name.substring(0, 2).toUpperCase();
-            const container = document.getElementById('rating-inputs');
-            container.innerHTML = '';
-
-            if (!t.subjectIds || t.subjectIds.length === 0) {
-                container.innerHTML = `<div class="text-center p-6 bg-yellow-50 rounded-lg border text-yellow-800">Keine Fächer zugeordnet.</div>`;
-                showView('view-rate'); return;
-            }
-
-            t.subjectIds.forEach(sid => {
-                const sub = subjectsData.find(s => s.id === sid);
-                if (!sub) return;
-                container.innerHTML += `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 gap-3 hover:border-indigo-200 transition">
-                        <label class="font-bold text-slate-700 w-1/3">${sub.label}</label>
-                        <div class="flex gap-1 justify-end flex-1">
-                            <label class="cursor-pointer group relative mr-4 flex flex-col items-center">
-                                <input type="radio" name="${sid}" value="0" class="peer sr-only" checked>
-                                <span class="block w-10 h-10 flex items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-slate-300 font-bold peer-checked:bg-slate-200 peer-checked:text-slate-500 peer-checked:border-slate-300 hover:bg-slate-100 transition select-none">✕</span>
-                                <span class="text-[9px] text-slate-400 mt-1 uppercase font-bold tracking-wider">Egal</span>
-                            </label>
-                            ${[1, 2, 3, 4, 5, 6].map(n => `
-                                <label class="cursor-pointer group relative flex flex-col items-center">
-                                    <input type="radio" name="${sid}" value="${n}" class="peer sr-only">
-                                    <span class="block w-10 h-10 flex items-center justify-center rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-600 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:border-indigo-300 transition select-none shadow-sm">${n}</span>
-                                </label>`).join('')}
+                        <div class="grid grid-cols-2 gap-2 mt-6 relative z-10">
+                            <button onclick="${rateAction}" class="bg-slate-900 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-black transition shadow-md">${rateBtnText}</button>
+                            <button onclick="generateCertificate('${h._id}')" class="bg-white border border-slate-200 text-slate-700 py-2.5 rounded-lg text-xs font-bold hover:bg-slate-50 hover:text-indigo-600 transition">ZEUGNIS</button>
                         </div>
                     </div>`;
             });
+        }
+
+        function changePage(d) { currentPage += d; renderHumans(); }
+
+        // *** RATING ***
+        function openRate(id) {
+            if (!currentUser) { showLogin(); return; }
+            const h = humansData.find(x => x._id === id); if (!h) return;
+
+            document.getElementById('rate-human-name').innerText = h.name;
+            document.getElementById('rate-human-id').value = id;
+            document.getElementById('rate-avatar').innerText = h.name.substring(0, 2).toUpperCase();
+
+            const catObj = categoriesData.find(c => c.id === h.categoryId);
+            document.getElementById('rate-human-cat').innerText = catObj ? catObj.label : '';
+
+            const container = document.getElementById('rating-inputs');
+            container.innerHTML = '';
+
+            const myCriteria = criteriaData.filter(c => (h.criteriaIds || []).includes(c.id));
+            if (myCriteria.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-400 py-4">Keine Kriterien für diese Person definiert.</p>';
+            }
+
+            myCriteria.forEach(crit => {
+                // Radio buttons 0-6
+                let radios = `<label class="cursor-pointer mr-3 opacity-60 hover:opacity-100 transition group flex flex-col items-center"><input type="radio" name="${crit.id}" value="0" class="sr-only peer" checked><span class="block w-9 h-9 rounded-lg bg-slate-200 text-slate-500 font-bold flex items-center justify-center peer-checked:bg-slate-300 peer-checked:ring-2 peer-checked:ring-slate-300">✕</span></label>`;
+
+                for (let n = 1; n <= 6; n++) {
+                    radios += `<label class="cursor-pointer"><input type="radio" name="${crit.id}" value="${n}" class="sr-only peer"><span class="block w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-900 font-bold flex items-center justify-center peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 hover:border-slate-400 transition shadow-sm">${n}</span></label>`;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-slate-50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center border border-slate-200 gap-3">
+                        <span class="font-bold text-slate-700 w-full md:w-1/3 text-center md:text-left">${crit.label}</span>
+                        <div class="flex gap-1">${radios}</div>
+                    </div>`;
+            });
+
             showView('view-rate');
         }
 
         async function submitRating(e) {
             e.preventDefault();
-            const tId = document.getElementById('rate-teacher-id').value;
+            const hId = document.getElementById('rate-human-id').value;
             const grades = {};
-            let hasAtLeastOneGrade = false;
-            document.querySelectorAll('#rating-inputs input[type="radio"]:checked').forEach(inp => {
-                const val = parseInt(inp.value);
-                if (val > 0) { grades[inp.name] = val; hasAtLeastOneGrade = true; }
+            let hasGrade = false;
+            document.querySelectorAll('#rating-inputs input:checked').forEach(i => {
+                const val = parseInt(i.value);
+                if (val > 0) { grades[i.name] = val; hasGrade = true; }
             });
-            if (!hasAtLeastOneGrade) return alert("Bitte wähle mindestens eine Note (1-6).");
 
-            try {
-                const res = await fetch(API_URL + '/api/school/rate', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ teacherId: tId, grades }), credentials: 'include'
-                });
-                if (res.ok) { alert("Gespeichert!"); showDashboard(); } else { const d = await res.json(); alert("Fehler: " + d.error); }
-            } catch (e) { alert("Fehler."); }
-        }
+            if (!hasGrade) return alert("Bitte mindestens eine Note vergeben.");
 
-        // *** ADMIN ***
-        function showAdminPanel() { showView('view-admin'); switchAdminTab('teachers'); }
-        function switchAdminTab(tab) {
-            document.getElementById('admin-tab-teachers').classList.add('hidden');
-            document.getElementById('admin-tab-subjects').classList.add('hidden');
-            const btnT = document.getElementById('tab-btn-teachers');
-            const btnS = document.getElementById('tab-btn-subjects');
-            [btnT, btnS].forEach(b => b.className = "px-6 py-3 rounded-t-lg font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors");
-            const activeClass = "px-6 py-3 rounded-t-lg font-bold border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
-            if (tab === 'teachers') {
-                document.getElementById('admin-tab-teachers').classList.remove('hidden');
-                btnT.className = activeClass;
-                renderTeacherAdminList();
-                renderTeacherCreationFormSubjects();
-            } else {
-                document.getElementById('admin-tab-subjects').classList.remove('hidden');
-                btnS.className = activeClass;
-                renderSubjectList();
-            }
-        }
-
-        function renderTeacherCreationFormSubjects() {
-            const container = document.getElementById('teacher-subject-select');
-            container.innerHTML = '';
-            const sorted = [...subjectsData].sort((a, b) => {
-                if (a.type === b.type) return a.label.localeCompare(b.label);
-                return a.type === 'pflicht' ? -1 : 1;
+            const res = await fetch(API_URL + '/api/human/rate', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ humanId: hId, grades }), credentials: 'include'
             });
-            sorted.forEach(s => {
-                container.innerHTML += `
-                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-2 rounded transition">
-                        <input type="checkbox" value="${s.id}" class="new-teacher-sub-check rounded w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300">
-                        <span class="truncate text-slate-700 font-medium" title="${s.label}">${s.label}</span>
-                        ${s.type === 'pflicht' ? '<span class="ml-auto text-[10px] bg-blue-100 text-blue-600 px-1 rounded font-bold">P</span>' : '<span class="ml-auto text-[10px] bg-orange-100 text-orange-600 px-1 rounded font-bold">W</span>'}
-                    </label>`;
-            });
+            if (res.ok) { alert("Gespeichert."); showDashboard(); loadHumans(); }
+            else alert("Fehler beim Speichern.");
         }
 
-        function renderTeacherAdminList() {
-            const list = document.getElementById('admin-teacher-list');
-            document.getElementById('admin-teacher-count').innerText = teachersData.length;
-            list.innerHTML = '';
-            const sorted = [...teachersData].sort((a, b) => a.name.localeCompare(b.name));
-            sorted.forEach(t => {
-                const subCount = (t.subjectIds || []).length;
-                list.innerHTML += `
-                    <div class="flex justify-between items-center bg-white p-3 border rounded-lg shadow-sm hover:border-indigo-300 transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-xs">${t.name.substring(0, 2).toUpperCase()}</div>
-                            <div><span class="font-bold block text-sm text-slate-800">${t.name}</span><span class="text-xs text-slate-400">${subCount} Fächer • ${t.ratingCount || 0} Votes</span></div>
-                        </div>
-                        <div class="flex gap-2 opacity-100 sm:opacity-50 group-hover:opacity-100 transition">
-                            <button onclick="startEditTeacher('${t._id}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded text-xs font-bold uppercase border border-blue-100">Bearb.</button>
-                            <button onclick="deleteTeacher('${t._id}')" class="text-red-500 hover:bg-red-50 p-2 rounded text-xs font-bold uppercase border border-red-100">Löschen</button>
-                        </div>
-                    </div>`;
-            });
-        }
+        // *** ADMIN PANEL ***
+        function showAdminPanel() { showView('view-admin'); switchAdminView('humans'); }
 
-        function startEditTeacher(id) {
-            const t = teachersData.find(x => x._id === id); if (!t) return;
-            document.getElementById('edit-teacher-id').value = id;
-            document.getElementById('new-teacher-name').value = t.name;
-            const title = document.getElementById('teacher-form-title');
-            title.innerText = "Lehrer bearbeiten"; title.classList.add("text-orange-600");
-            const btn = document.getElementById('save-teacher-btn');
-            btn.innerText = "Speichern"; btn.className = "flex-1 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition shadow";
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            const checks = document.querySelectorAll('.new-teacher-sub-check');
-            checks.forEach(c => { c.checked = (t.subjectIds || []).includes(c.value); });
-            document.getElementById('admin-tab-teachers').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function resetTeacherForm() {
-            document.getElementById('edit-teacher-id').value = '';
-            document.getElementById('new-teacher-name').value = '';
-            const title = document.getElementById('teacher-form-title');
-            title.innerText = "Neuen Lehrer hinzufügen"; title.classList.remove("text-orange-600");
-            const btn = document.getElementById('save-teacher-btn');
-            btn.innerText = "Erstellen"; btn.className = "flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition shadow";
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-            document.querySelectorAll('.new-teacher-sub-check').forEach(c => c.checked = false);
-        }
-
-        async function saveTeacher() {
-            const id = document.getElementById('edit-teacher-id').value;
-            const name = document.getElementById('new-teacher-name').value;
-            const checks = document.querySelectorAll('.new-teacher-sub-check:checked');
-            const subjectIds = Array.from(checks).map(c => c.value);
-            if (!name.trim()) return alert("Name fehlt");
-            let url = API_URL + '/api/school/admin/teachers';
-            let method = 'POST';
-            if (id) { url += '/' + id; method = 'PUT'; }
-            try {
-                const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, subjectIds }), credentials: 'include' });
-                if (res.ok) { resetTeacherForm(); loadTeachers(); } else { alert("Fehler."); }
-            } catch (e) { alert("Serverfehler"); }
-        }
-
-        async function deleteTeacher(id) {
-            if (!confirm("Wirklich löschen?")) return;
-            try {
-                const res = await fetch(API_URL + '/api/school/admin/teachers/' + id, { method: 'DELETE', credentials: 'include' });
-                if (res.ok) loadTeachers(); else alert("Fehler.");
-            } catch (e) { alert("Serverfehler"); }
-        }
-
-        function renderSubjectList() {
-            const list = document.getElementById('subject-list'); list.innerHTML = '';
-            const sorted = [...subjectsData].sort((a, b) => { if (a.type === b.type) return a.label.localeCompare(b.label); return a.type === 'pflicht' ? -1 : 1; });
-            sorted.forEach(s => {
-                const isPflicht = s.type === 'pflicht';
-                list.innerHTML += `
-                    <div class="flex justify-between items-center bg-slate-50 p-4 border border-slate-200 rounded-xl shadow-sm">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <span class="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide ${isPflicht ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}">${isPflicht ? 'PFL' : 'WAHL'}</span>
-                            <span class="font-bold text-slate-700 truncate" title="${s.label}">${s.label}</span>
-                        </div>
-                        <button onclick="deleteSubject('${s.id}')" class="text-slate-400 hover:text-red-500 transition px-2">🗑️</button>
-                    </div>`;
-            });
-        }
-
-        async function addSubject() {
-            const label = document.getElementById('new-subject-label').value;
-            const type = document.getElementById('new-subject-type').value;
-            if (!label.trim()) return alert("Name fehlt");
-            try {
-                const res = await fetch(API_URL + '/api/school/admin/subjects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label, type }), credentials: 'include' });
-                if (res.ok) { document.getElementById('new-subject-label').value = ''; await loadSubjects(); renderSubjectList(); } else { alert("Fehler."); }
-            } catch (e) { }
-        }
-
-        async function deleteSubject(id) {
-            if (!confirm("Wirklich löschen?")) return;
-            try {
-                const res = await fetch(API_URL + '/api/school/admin/subjects/' + id, { method: 'DELETE', credentials: 'include' });
-                if (res.ok) { await loadSubjects(); renderSubjectList(); }
-            } catch (e) { }
-        }
-
-        // *** CANVAS GENERATOR ***
-        function generateCertificate(id) {
-            const t = teachersData.find(x => x._id === id);
-            drawCanvas(t, false);
-        }
-
-        function generateSchoolCertificate() {
-            const schoolAverages = {};
-            const counts = {};
-            teachersData.forEach(t => {
-                if (!t.averages) return;
-                Object.keys(t.averages).forEach(subId => {
-                    const val = t.averages[subId];
-                    if (val) {
-                        if (!schoolAverages[subId]) { schoolAverages[subId] = 0; counts[subId] = 0; }
-                        schoolAverages[subId] += val; counts[subId]++;
-                    }
-                });
-            });
-            const finalAverages = {};
-            Object.keys(schoolAverages).forEach(subId => { if (counts[subId] > 0) finalAverages[subId] = schoolAverages[subId] / counts[subId]; });
-            const schoolObj = { _id: 'school-global', name: "Das gesamte Kollegium", averages: finalAverages, subjectIds: Object.keys(finalAverages) };
-            drawCanvas(schoolObj, true);
-        }
-
-        // *** CANVAS GENERATOR ***
-        // ... generateCertificate und generateSchoolCertificate bleiben gleich ...
-
-        function drawCanvas(data, isSchool) {
-            const cvs = document.getElementById('cert-canvas');
-            const ctx = cvs.getContext('2d');
-
-            // --- High-DPI Scaling Fix (NEU) ---
-            // Ermittle die Pixeldichte des Geräts (z.B. 2 für Retina)
-            const dpr = window.devicePixelRatio || 1;
-            
-            // Die gewünschte logische Größe (A4-ähnlich)
-            const logicalWidth = 595;
-            const logicalHeight = 842;
-
-            // Setze die interne Auflösung des Canvas hoch
-            cvs.width = logicalWidth * dpr;
-            cvs.height = logicalHeight * dpr;
-
-            // Zwinge die Anzeige per CSS wieder auf die logische Größe
-            cvs.style.width = `${logicalWidth}px`;
-            cvs.style.height = `${logicalHeight}px`;
-
-            // Skaliere den Zeichenkontext, damit alle folgenden Koordinaten automatisch angepasst werden
-            // WICHTIG: Reset Transform zuerst, falls die Funktion mehrmals aufgerufen wird
-            ctx.setTransform(1, 0, 0, 1, 0, 0); 
-            ctx.scale(dpr, dpr);
-            // ----------------------------------
-            
-            // Reset Hintergrund (nutze logische Maße)
-            ctx.fillStyle = "#ffffff"; 
-            ctx.fillRect(0,0, logicalWidth, logicalHeight);
-            
-            // Fonts & Co definieren (Ab hier alles wie vorher)
-            const fontBold = "bold 14px Arial, sans-serif";
-            const fontNormal = "12px Arial, sans-serif";
-            const fontTitle = "bold 20px Arial, sans-serif";
-
-            // --- Header ---
-            ctx.fillStyle = "#000000"; ctx.textAlign = "center";
-            ctx.font = fontBold; 
-            // Benutze logicalWidth statt cvs.width/dpr für die Mitte
-            ctx.fillText("Anne Frank Realschule Ahaus", logicalWidth/2, 40);
-            ctx.font = fontNormal; 
-            ctx.fillText("Staatliche Realschule", logicalWidth/2, 58);
-            
-            const curY = new Date().getFullYear(); 
-            const nextY = (curY+1).toString().substr(2);
-            
-            ctx.textAlign = "left"; 
-            ctx.fillText(`Schuljahr ${curY}/${nextY}`, 50, 85);
-            ctx.textAlign = "right"; 
-            ctx.fillText("Jahrgangsstufe 10", logicalWidth-50, 85);
-
-            // --- Titel ---
-            ctx.textAlign = "center";
-            ctx.font = "bold 12px Arial, sans-serif"; 
-            ctx.fillText("Mittlere - Reife - Zug", logicalWidth/2, 120);
-            
-            ctx.font = "bold 26px Arial, sans-serif"; 
-            ctx.letterSpacing = "2px";
-            ctx.fillText(isSchool ? "SCHUL-GESAMTZEUGNIS" : "ZEUGNIS", logicalWidth/2, 155);
-            ctx.letterSpacing = "0px";
-            
-            ctx.font = "14px Arial, sans-serif"; 
-            ctx.fillText("für", logicalWidth/2, 180);
-            
-            ctx.font = "bold 20px Arial, sans-serif"; 
-            ctx.fillText(data.name, logicalWidth/2, 210);
-            
-            // Dicke Linie
-            ctx.beginPath(); ctx.moveTo(50, 230); ctx.lineTo(logicalWidth-50, 230); 
-            ctx.strokeStyle="#000"; ctx.lineWidth=1.5; ctx.stroke();
-
-            // --- Noten Grid Layout ---
-            let yStart = 280;
-            let rowHeight = 35;
-            
-            const col1X = 60;  const col1GradeX = 240;
-            const col2X = 320; const col2GradeX = 500;
-
-            // Mapping: ID -> Position (1 = Links, 2 = Rechts)
-            const layoutMap = {
-                'rel': 1, 'deu': 1, 'mat': 1, 'eng': 1,
-                'phy': 2, 'che': 2, 'bio': 2, 'spo': 2, 'gse': 2, 'his': 2, 'pol': 2, 'geo': 2, 'awt': 2, 'mus': 2, 'art': 2
-            };
-
-            const leftSubjects = [];
-            const rightSubjects = [];
-            const bottomSubjects = [];
-
-            const avgs = data.averages || {};
-            const relevantSubjects = subjectsData.filter(s => (data.subjectIds||[]).includes(s.id));
-
-            relevantSubjects.forEach(s => {
-                if(s.type === 'pflicht') {
-                    if(layoutMap[s.id] === 1) leftSubjects.push(s);
-                    else if(layoutMap[s.id] === 2) rightSubjects.push(s);
-                    else leftSubjects.push(s);
-                } else {
-                    bottomSubjects.push(s);
+        function switchAdminView(view) {
+            currentAdminView = view;
+            ['humans', 'criteria', 'categories', 'moderation'].forEach(v => {
+                const btn = document.getElementById('adm-btn-' + v);
+                if (btn) {
+                    if (v === view) btn.className = "font-bold text-slate-900 border-b-2 border-slate-900 pb-1 transition";
+                    else btn.className = "font-bold text-slate-500 hover:text-slate-900 pb-1 transition";
                 }
             });
+            const content = document.getElementById('admin-content');
+            if (view === 'moderation') content.className = "block";
+            else content.className = "grid grid-cols-1 lg:grid-cols-3 gap-8";
 
-            // Hilfsfunktion Zeile Zeichnen
-            function drawRow(sub, xTxt, xBox, yPos) {
-                const gradeVal = avgs[sub.id] ? avgs[sub.id].toFixed(2) : "---";
-                const hasGrade = !!avgs[sub.id];
+            refreshAdminView();
+        }
 
-                ctx.textAlign = "left"; ctx.fillStyle = "#000"; ctx.font = "13px Arial, sans-serif";
-                ctx.fillText(sub.label, xTxt, yPos);
+        function refreshAdminView() {
+            if (currentAdminView === 'humans') renderAdminHumans();
+            else if (currentAdminView === 'criteria') renderAdminCriteria();
+            else if (currentAdminView === 'categories') renderAdminCategories();
+            else if (currentAdminView === 'moderation') renderAdminModeration();
+        }
 
-                // Graue Box
-                ctx.fillStyle = "#e0e0e0"; if(!hasGrade) ctx.fillStyle = "#f5f5f5";
-                ctx.fillRect(xBox, yPos-14, 60, 20);
+        // --- Admin: Humans ---
+        function renderAdminHumans() {
+            const c = document.getElementById('admin-content');
+            // Formular
+            const options = categoriesData.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
 
-                // Note
-                ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.font = "bold 13px Arial, sans-serif";
-                if(!hasGrade) ctx.fillStyle = "#999";
-                ctx.fillText(gradeVal, xBox+30, yPos);
+            const humansList = humansData.map(h => {
+                const catLabel = categoriesData.find(c => c.id === h.categoryId)?.label || h.categoryId;
+                return `
+                <div class="flex justify-between items-center bg-white p-4 border rounded-xl hover:border-indigo-300 transition group shadow-sm">
+                    <div>
+                        <span class="font-bold text-slate-800 block">${h.name}</span>
+                        <span class="text-xs text-slate-400 uppercase tracking-wider">${catLabel}</span>
+                    </div>
+                    <div class="flex gap-2 opacity-100 sm:opacity-60 group-hover:opacity-100 transition">
+                        <button onclick="startEditHuman('${h._id}')" class="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-bold">Bearbeiten</button>
+                        <button onclick="deleteHuman('${h._id}')" class="text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold">Löschen</button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            c.innerHTML = `
+                <div class="lg:col-span-1 bg-slate-50 p-5 rounded-xl h-fit border border-slate-200 sticky top-0">
+                    <h3 class="font-bold mb-4 text-slate-700" id="form-title">Person hinzufügen</h3>
+                    <input type="hidden" id="edit-human-id">
+                    <div class="mb-3"><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Name</label><input type="text" id="new-human-name" placeholder="Name" class="w-full p-3 border rounded-lg focus:ring-slate-900 bg-white"></div>
+                    <div class="mb-4"><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Kategorie</label><select id="new-human-cat" class="w-full p-3 border rounded-lg bg-white" onchange="renderNewHumanCriteria()"><option value="">Bitte wählen...</option>${options}</select></div>
+                    <div class="mb-2 font-bold text-xs text-slate-400 uppercase tracking-wide">Kriterien:</div>
+                    <div id="criteria-select" class="max-h-48 overflow-y-auto mb-4 bg-white p-3 rounded-lg border border-slate-200 text-sm space-y-1 shadow-inner"><div class="text-slate-400 italic text-center py-2">Erst Kategorie wählen</div></div>
+                    <div class="flex gap-2">
+                        <button onclick="saveHuman()" id="btn-save-human" class="flex-1 bg-slate-900 text-white p-3 rounded-lg font-bold hover:bg-black transition">Erstellen</button>
+                        <button onclick="resetHumanForm()" id="btn-cancel-human" class="hidden px-3 py-3 rounded-lg font-bold text-slate-500 hover:bg-slate-200 transition">✕</button>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 space-y-2 max-h-[600px] overflow-y-auto pr-1">${humansList}</div>
+            `;
+        }
+
+        function renderNewHumanCriteria(preIds = []) {
+            const cat = document.getElementById('new-human-cat').value;
+            const div = document.getElementById('criteria-select');
+            div.innerHTML = '';
+
+            if (!cat) { div.innerHTML = '<div class="text-slate-400 italic text-center py-2">Erst Kategorie wählen</div>'; return; }
+
+            const relevant = criteriaData.filter(c => c.categoryId === cat);
+            if (relevant.length === 0) { div.innerHTML = '<div class="text-slate-400 italic">Keine Kriterien.</div>'; return; }
+
+            relevant.sort((a, b) => (a.type === 'main' ? -1 : 1));
+
+            let html = '';
+            relevant.forEach(c => {
+                const isChecked = preIds.length > 0 ? preIds.includes(c.id) : true;
+                const badge = c.type === 'main' ? '<span class="ml-auto text-[10px] bg-slate-100 text-slate-500 px-1.5 rounded">Haupt</span>' : '';
+                const styleClass = c.type === 'main' ? 'font-bold text-slate-700' : 'text-slate-600';
+
+                html += `<label class="flex items-center gap-3 py-1.5 cursor-pointer hover:bg-slate-50 px-1 rounded transition"><input type="checkbox" value="${c.id}" class="human-crit-check w-4 h-4 text-slate-900 rounded focus:ring-slate-900 border-gray-300" ${isChecked ? 'checked' : ''}> <span class="${styleClass}">${c.label}</span> ${badge}</label>`;
+            });
+            div.innerHTML = html;
+        }
+
+        function startEditHuman(id) {
+            const h = humansData.find(x => x._id === id); if (!h) return;
+            document.getElementById('edit-human-id').value = h._id;
+            document.getElementById('new-human-name').value = h.name;
+            document.getElementById('new-human-cat').value = h.categoryId;
+
+            document.getElementById('form-title').innerText = "Person bearbeiten";
+            const btn = document.getElementById('btn-save-human');
+            btn.innerText = "Speichern";
+            document.getElementById('btn-cancel-human').classList.remove('hidden');
+
+            renderNewHumanCriteria(h.criteriaIds || []);
+        }
+
+        function resetHumanForm() {
+            document.getElementById('edit-human-id').value = '';
+            document.getElementById('new-human-name').value = '';
+            document.getElementById('new-human-cat').value = '';
+            document.getElementById('criteria-select').innerHTML = '<div class="text-slate-400 italic text-center py-2">Erst Kategorie wählen</div>';
+            document.getElementById('form-title').innerText = "Person hinzufügen";
+            document.getElementById('btn-save-human').innerText = "Erstellen";
+            document.getElementById('btn-cancel-human').classList.add('hidden');
+        }
+
+        async function saveHuman() {
+            const id = document.getElementById('edit-human-id').value;
+            const name = document.getElementById('new-human-name').value;
+            const categoryId = document.getElementById('new-human-cat').value;
+            const criteriaIds = Array.from(document.querySelectorAll('.human-crit-check:checked')).map(c => c.value);
+
+            if (!name.trim() || !categoryId) return alert("Daten fehlen.");
+
+            let url = API_URL + '/api/human/admin/humans';
+            let method = 'POST';
+            if (id) { url += '/' + id; method = 'PUT'; }
+
+            try {
+                const res = await fetch(url, {
+                    method: method, headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, categoryId, criteriaIds }), credentials: 'include'
+                });
+                if (res.ok) { resetHumanForm(); loadHumans(); renderAdminHumans(); }
+                else { alert("Fehler beim Speichern."); }
+            } catch (e) { alert("Serverfehler."); }
+        }
+
+        async function deleteHuman(id) {
+            if (!confirm("Löschen?")) return;
+            const res = await fetch(API_URL + '/api/human/admin/humans/' + id, { method: 'DELETE', credentials: 'include' });
+            if (res.ok) { loadHumans(); renderAdminHumans(); }
+        }
+
+        // --- Admin: Criteria/Cats ---
+        function renderAdminCriteria() {
+            const c = document.getElementById('admin-content');
+            const catOpts = categoriesData.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+            const list = criteriaData.map(c => `<div class="bg-white p-3 border rounded flex justify-between"><span>${c.label} <span class="text-xs text-slate-400 uppercase ml-2">${c.categoryId}</span></span></div>`).join('');
+
+            c.innerHTML = `
+                <div class="lg:col-span-1 bg-slate-50 p-4 rounded-xl h-fit border border-slate-200">
+                    <h3 class="font-bold mb-4">Neues Kriterium</h3>
+                    <input type="text" id="new-crit-label" placeholder="Bezeichnung" class="w-full p-2 border rounded mb-2">
+                    <select id="new-crit-cat" class="w-full p-2 border rounded mb-2 bg-white">${catOpts}</select>
+                    <select id="new-crit-type" class="w-full p-2 border rounded mb-4 bg-white"><option value="main">Hauptkriterium</option><option value="sec">Nebenkriterium</option></select>
+                    <button onclick="addCriteria()" class="w-full bg-slate-900 text-white p-2 rounded font-bold">Erstellen</button>
+                </div>
+                <div class="lg:col-span-2 space-y-2 max-h-96 overflow-y-auto">${list}</div>`;
+        }
+
+        async function addCriteria() {
+            const label = document.getElementById('new-crit-label').value;
+            const categoryId = document.getElementById('new-crit-cat').value;
+            const type = document.getElementById('new-crit-type').value;
+            const res = await fetch(API_URL + '/api/human/admin/criteria', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label, categoryId, type }), credentials: 'include' });
+            if (res.ok) { await loadMetaData(); renderAdminCriteria(); }
+        }
+
+        function renderAdminCategories() {
+            const c = document.getElementById('admin-content');
+            const list = categoriesData.map(c => `<div class="bg-white p-3 border rounded font-bold">${c.label}</div>`).join('');
+            c.innerHTML = `
+                <div class="lg:col-span-1 bg-slate-50 p-4 rounded-xl h-fit">
+                    <h3 class="font-bold mb-4">Neue Kategorie</h3>
+                    <input type="text" id="new-cat-label" placeholder="Name" class="w-full p-2 border rounded mb-4">
+                    <button onclick="addCategory()" class="w-full bg-slate-900 text-white p-2 rounded font-bold">Erstellen</button>
+                </div>
+                <div class="lg:col-span-2 space-y-2">${list}</div>`;
+        }
+
+        async function addCategory() {
+            const label = document.getElementById('new-cat-label').value;
+            const res = await fetch(API_URL + '/api/human/admin/categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label }), credentials: 'include' });
+            if (res.ok) { await loadMetaData(); renderAdminCategories(); renderCategoryTabs(); }
+        }
+
+        // --- Admin: Moderation ---
+        async function renderAdminModeration() {
+            const c = document.getElementById('admin-content');
+            c.innerHTML = '<div class="text-center py-10">Lade User...</div>';
+            try {
+                const res = await fetch(API_URL + '/api/human/admin/raters', { credentials: 'include' });
+                if (res.ok) { const data = await res.json(); adminRatersCache = data.raters; renderModerationList(); }
+                else c.innerHTML = '<p class="text-red-500">Fehler beim Laden.</p>';
+            } catch (e) { c.innerHTML = '<p class="text-red-500">Netzwerkfehler.</p>'; }
+        }
+
+        function renderModerationList(term = "") {
+            const c = document.getElementById('admin-content');
+            const filtered = adminRatersCache.filter(r => (r.username || "").toLowerCase().includes(term.toLowerCase()));
+            let html = `<div class="mb-6 flex gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200"><input type="text" oninput="renderModerationList(this.value)" placeholder="User suchen..." class="w-full lg:w-64 p-2 border rounded bg-white" value="${term}"><div class="text-sm text-slate-500 flex items-center">Zeige ${filtered.length} User</div></div><div class="space-y-2 max-h-[600px] overflow-y-auto">`;
+
+            if (filtered.length === 0) html += '<div class="text-center text-slate-400 py-10">Keine User gefunden.</div>';
+            else {
+                filtered.forEach(r => {
+                    html += `<div class="flex justify-between items-center bg-white p-4 border rounded-xl hover:border-indigo-300 transition cursor-pointer group" onclick="showUserRatings('${r._id}', '${r.username}')"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold">${(r.username || "?").substring(0, 1).toUpperCase()}</div><div><span class="font-bold text-slate-800 block group-hover:text-indigo-600 transition">${r.username || "Unbekannt"}</span><span class="text-xs text-slate-400">Zuletzt aktiv: ${new Date(r.lastActive).toLocaleDateString()}</span></div></div><div class="flex items-center gap-4"><span class="text-sm font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-600">${r.ratingCount} Bewertungen</span><span class="text-slate-300 group-hover:text-indigo-500">&rarr;</span></div></div>`;
+                });
+            }
+            c.innerHTML = html + '</div>';
+        }
+
+        async function showUserRatings(uid, uname) {
+            const c = document.getElementById('admin-content');
+            c.innerHTML = '<div class="text-center py-10">Lade Details...</div>';
+            try {
+                const res = await fetch(API_URL + '/api/human/admin/raters/' + uid, { credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json();
+                    let html = `<button onclick="renderAdminModeration()" class="mb-4 text-indigo-600 font-bold flex items-center gap-1 hover:underline">&larr; Zurück</button><h3 class="text-xl font-bold mb-6 border-b pb-2">Bewertungen von <span class="text-indigo-600">${uname}</span></h3><div class="space-y-3 max-h-[600px] overflow-y-auto">`;
+                    if (data.ratings.length === 0) html += '<p>Keine Bewertungen.</p>';
+                    data.ratings.forEach(r => {
+                        let gradesText = '<div class="flex flex-wrap gap-2 mt-2">';
+                        for (const [critId, val] of Object.entries(r.grades)) {
+                            const critLabel = criteriaData.find(cr => cr.id === critId)?.label || critId;
+                            let color = val < 2.5 ? 'bg-green-100 text-green-700' : (val > 4.5 ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700');
+                            gradesText += `<span class="text-xs px-2 py-1 rounded ${color} border border-black/5"><b>${critLabel}:</b> ${val}</span>`;
+                        }
+                        html += `<div class="bg-white p-4 border rounded-xl shadow-sm hover:shadow-md transition"><div class="flex justify-between items-start"><div><span class="text-xs text-slate-400 uppercase tracking-widest font-bold">Bewertete Person</span><h4 class="text-lg font-bold text-slate-800">${r.humanName}</h4><span class="text-xs text-slate-400">${new Date(r.timestamp).toLocaleString()}</span></div><button onclick="deleteUserRating('${r._id}', '${uid}', '${uname}')" class="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-xs font-bold border border-red-100">Löschen 🗑️</button></div>${gradesText}</div></div>`;
+                    });
+                    c.innerHTML = html + '</div>';
+                }
+            } catch (e) { alert("Fehler."); renderAdminModeration(); }
+        }
+
+        async function deleteUserRating(rid, uid, uname) {
+            if (!confirm("Löschen?")) return;
+            const res = await fetch(API_URL + '/api/human/admin/ratings/' + rid, { method: 'DELETE', credentials: 'include' });
+            if (res.ok) showUserRatings(uid, uname);
+        }
+
+        // *** CERTIFICATE GENERATOR ***
+        function generateCertificate(id) {
+            const h = humansData.find(x => x._id === id);
+            const catLabel = categoriesData.find(c => c.id === h.categoryId)?.label || "Mensch";
+            renderCert(h, catLabel + " ZEUGNIS", false);
+        }
+
+        function generateCategoryCertificate() {
+            const targetCat = activeCategory === 'all' ? null : activeCategory;
+            const humansInCat = targetCat ? humansData.filter(h => h.categoryId === targetCat) : humansData;
+            if (humansInCat.length === 0) return alert("Keine Daten.");
+
+            const agg = {}; const counts = {};
+            humansInCat.forEach(h => {
+                if (!h.averages) return;
+                Object.keys(h.averages).forEach(cId => {
+                    if (!agg[cId]) { agg[cId] = 0; counts[cId] = 0; }
+                    agg[cId] += h.averages[cId]; counts[cId]++;
+                });
+            });
+            const finalAvgs = {}; Object.keys(agg).forEach(cId => { if (counts[cId] > 0) finalAvgs[cId] = agg[cId] / counts[cId]; });
+            const catLabel = targetCat ? (categoriesData.find(c => c.id === targetCat)?.label + " GESAMT-ZEUGNIS") : "GLOBALES ZEUGNIS";
+            const fakeObj = { _id: 'global', categoryId: targetCat || 'global', name: targetCat ? "Alle " + categoriesData.find(c => c.id === targetCat).label : "Alle Menschen", averages: finalAvgs, criteriaIds: Object.keys(finalAvgs) };
+            renderCert(fakeObj, catLabel.toUpperCase(), true);
+        }
+
+        function renderCert(data, title, isGlobal) {
+            currentCertFileName = data.name.replace(/[^a-z0-9]/gi, '_');
+            const cvs = document.getElementById('cert-canvas'); const ctx = cvs.getContext('2d');
+            const dpr = window.devicePixelRatio || 1; const w = 595; const h = 842;
+            cvs.width = w * dpr; cvs.height = h * dpr; cvs.style.width = w + 'px'; cvs.style.height = h + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
+
+            // SVG init - WICHTIG: &amp; in der URL!
+            let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><style>@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&amp;family=Inter:wght@400;600&amp;family=Dancing+Script:wght@700&amp;family=Courier+Prime:wght@700&amp;display=swap');</style></defs><rect width="100%" height="100%" fill="white"/>`;
+
+            const drawText = (text, x, y, size, font, align = "left", color = "#000000", weight = "normal") => {
+                ctx.fillStyle = color; ctx.textAlign = align;
+                let fontStack = 'Inter, sans-serif';
+                if (font === 'serif') fontStack = 'Merriweather, serif'; if (font === 'mono') fontStack = 'Courier Prime, monospace'; if (font === 'script') fontStack = 'Dancing Script, cursive';
+                ctx.font = `${weight} ${size}px ${fontStack}`; ctx.fillText(text, x, y);
+                let anchor = "start"; if (align === "center") anchor = "middle"; if (align === "right") anchor = "end";
+                const safeText = text.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                svg += `<text x="${x}" y="${y}" font-family="${fontStack}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}">${safeText}</text>`;
+            };
+            const drawRect = (x, y, w, h, color) => { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${color}"/>`; };
+            const drawStrokeRect = (x, y, w, h, color) => { ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h); svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${color}" stroke-width="1"/>`; };
+            const drawLine = (x1, y1, x2, y2, color = "#000", width = 1, dash = []) => {
+                ctx.beginPath(); ctx.lineWidth = width; ctx.strokeStyle = color; ctx.setLineDash(dash); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+                const dashAttr = dash.length > 0 ? `stroke-dasharray="${dash.join(',')}"` : ""; svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${dashAttr} />`;
+            };
+
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
+            drawStrokeRect(20, 20, w - 40, h - 40, "#000"); drawStrokeRect(24, 24, w - 48, h - 48, "#666");
+            drawText("HUMAN GRADES", w / 2, 60, 24, "sans", "center", "#1e293b", "900"); drawText("OFFIZIELLE BEWERTUNG", w / 2, 78, 10, "sans", "center", "#64748b", "normal");
+
+            const curY = new Date().getFullYear(); const nextY = (curY + 1).toString().substr(2);
+            drawText(`Zeitraum ${curY}/${nextY}`, 60, 100, 12, "sans", "left", "#000"); drawText("Datenstand: Aktuell", w - 60, 100, 12, "sans", "right", "#000");
+
+            drawText("Gesamtbewertung", w / 2, 140, 14, "sans", "center", "#000", "bold");
+            drawText(title, w / 2, 175, 32, "serif", "center", "#0f172a", "bold");
+            drawText("für", w / 2, 200, 16, "serif", "center", "#475569", "italic");
+            drawText(data.name, w / 2, 235, 26, "sans", "center", "#000", "bold");
+            drawLine(60, 255, w - 60, 255, "#0f172a", 2);
+
+            const isTeacher = data.categoryId === 'lehrer'; let y = 290;
+            const avgs = data.averages || {};
+            const relCriteria = criteriaData.filter(c => (data.criteriaIds || []).includes(c.id));
+            relCriteria.sort((a, b) => (a.type === 'main' ? -1 : 1));
+
+            const col1X = 70; const col1GradeX = 250; const col2X = 330; const col2GradeX = 510; const colSingleX = 140; const colSingleGradeX = 400;
+
+            const renderRow = (crit, xTxt, xBox, yPos) => {
+                const val = avgs[crit.id] ? avgs[crit.id].toFixed(2) : "---"; const hasVal = !!avgs[crit.id];
+                drawText(crit.label, xTxt, yPos, 13, "sans", "left", "#1e293b", crit.type === 'main' ? "bold" : "normal");
+                let boxColor = "#ffffff";
+                if (hasVal) { const v = avgs[crit.id]; boxColor = v < 2.5 ? "#dcfce7" : (v > 4.5 ? "#fee2e2" : "#f1f5f9"); drawRect(xBox, yPos - 14, 60, 20, boxColor); }
+                else { drawStrokeRect(xBox, yPos - 14, 60, 20, "#e2e8f0"); }
+                drawText(val, xBox + 30, yPos, 13, "mono", "center", "#0f172a", "bold");
+                const estW = crit.label.length * 7; drawLine(xTxt + estW + 10, yPos - 4, xBox - 10, yPos - 4, "#cbd5e1", 1, [2, 3]);
+            };
+
+            if (isTeacher) {
+                let yL = y, yR = y; const mainCrits = relCriteria.filter(c => c.type === 'main'); const secCrits = relCriteria.filter(c => c.type !== 'main');
+                mainCrits.forEach((crit, i) => { const isLeft = i % 2 === 0; if (isLeft) { renderRow(crit, col1X, col1GradeX, yL); yL += 35; } else { renderRow(crit, col2X, col2GradeX, yR); yR += 35; } });
+                let ySec = Math.max(yL, yR) + 25;
+                if (secCrits.length > 0) { drawText("Wahlpflichtfächer / Weitere", 70, ySec, 12, "sans", "left", "#64748b", "bold italic"); ySec += 30; secCrits.forEach(crit => { renderRow(crit, col1X, col1GradeX, ySec); ySec += 35; }); }
+            } else {
+                let lastType = 'main'; let yPos = y;
+                relCriteria.forEach(crit => { if (crit.type !== lastType) { yPos += 20; drawText("WEITERE MERKMALE", w / 2, yPos, 11, "sans", "center", "#94a3b8", "italic"); yPos += 30; lastType = crit.type; } renderRow(crit, colSingleX, colSingleGradeX, yPos); yPos += 35; });
             }
 
-            // Zeichne Linke Spalte
-            let yL = yStart;
-            leftSubjects.forEach(s => { drawRow(s, col1X, col1GradeX, yL); yL += rowHeight; });
+            const yF = 760; drawLine(60, yF, 260, yF, "#000");
+            const date = new Date().toLocaleDateString('de-DE');
+            drawText(date, 160, yF - 5, 12, "serif", "center", "#000", "italic"); drawText("Ausstellungsdatum", 160, yF + 15, 10, "sans", "center", "#64748b");
+            drawLine(335, yF, 535, yF, "#000");
+            drawText("Limo Organisation", 435, yF - 5, 18, "script", "center", "#000", "bold"); drawText("Human Grades Vereinigung", 435, yF + 15, 10, "sans", "center", "#64748b");
+            drawText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, w / 2, 815, 9, "sans", "center", "#94a3b8");
 
-            // Zeichne Rechte Spalte
-            let yR = yStart;
-            rightSubjects.forEach(s => { drawRow(s, col2X, col2GradeX, yR); yR += rowHeight; });
+            svg += `</svg>`; currentSvgContent = svg; showView('view-certificate');
+        }
 
-            let yBottom = Math.max(yL, yR) + 20;
-
-            // Wahlpflicht Header
-            if(bottomSubjects.length > 0) {
-                ctx.textAlign = "left"; ctx.fillStyle = "#000";
-                ctx.font = "bold italic 12px Arial, sans-serif";
-                ctx.fillText("Wahlpflichtfächer / Weitere", col1X, yBottom);
-                yBottom += 25;
-                bottomSubjects.forEach(s => { drawRow(s, col2X, col2GradeX, yBottom); yBottom += rowHeight; });
-            }
-
-            // --- Footer ---
-            const dateStr = new Date().toLocaleDateString('de-DE');
-            let yFooter = 720;
-            
-            ctx.beginPath(); ctx.lineWidth=1; 
-            ctx.moveTo(50, yFooter); ctx.lineTo(250, yFooter); 
-            ctx.moveTo(345, yFooter); ctx.lineTo(545, yFooter); 
-            ctx.stroke();
-
-            ctx.textAlign = "center"; ctx.font = "11px Arial, sans-serif";
-            ctx.fillText(dateStr, 150, yFooter-10);
-            ctx.fillText(isSchool?"Schülersprecher":"Schulleiter", 150, yFooter+15);
-            ctx.fillText(isSchool?"Elternbeirat":"Klassenleiter", 445, yFooter+15);
-
-            // Tech Info
-            ctx.fillStyle = "#aaa"; ctx.font = "9px Arial, sans-serif"; 
-            ctx.fillText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, logicalWidth/2, 820);
-            
-            const link = document.getElementById('download-link'); link.href = cvs.toDataURL("image/png");
-            showView('view-certificate');
+        // --- DOWNLOAD ---
+        function downloadPNG() {
+            const cvs = document.getElementById('cert-canvas');
+            const link = document.createElement('a');
+            link.download = `HumanGrades_${currentCertFileName}.png`;
+            link.href = cvs.toDataURL("image/png");
+            link.click();
+        }
+        function downloadSVG() {
+            const blob = new Blob([currentSvgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `HumanGrades_${currentCertFileName}.svg`;
+            link.href = url;
+            link.click();
         }
 
         checkAuth();
