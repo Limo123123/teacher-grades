@@ -40,6 +40,15 @@
         .brand-gradient {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
+
+        /* Canvas Responsive Fix */
+        #cert-canvas {
+            max-width: 100%;
+            height: auto !important;
+            /* Wichtig für Aspect Ratio */
+            display: block;
+            margin: 0 auto;
+        }
     </style>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Courier+Prime:wght@700&family=Dancing+Script:wght@700&family=Merriweather:wght@700&display=swap"
@@ -814,80 +823,210 @@
 
         function renderCert(data, title, isGlobal) {
             currentCertFileName = data.name.replace(/[^a-z0-9]/gi, '_');
-            const cvs = document.getElementById('cert-canvas'); const ctx = cvs.getContext('2d');
-            const dpr = window.devicePixelRatio || 1; const w = 595; const h = 842;
-            cvs.width = w * dpr; cvs.height = h * dpr; cvs.style.width = w + 'px'; cvs.style.height = h + 'px';
-            ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
 
-            // SVG init - WICHTIG: &amp; in der URL!
+            const cvs = document.getElementById('cert-canvas');
+            const ctx = cvs.getContext('2d');
+
+            // --- 1. DATEN VORBEREITEN ---
+            const avgs = data.averages || {};
+            const relCriteria = criteriaData.filter(c => (data.criteriaIds || []).includes(c.id));
+            relCriteria.sort((a,b) => (a.type === 'main' ? -1 : 1));
+
+            const isTeacher = data.categoryId === 'lehrer';
+            
+            // --- 2. LAYOUT BERECHNUNG (VOR DEM ZEICHNEN) ---
+            const rowHeight = 35;
+            const spacerHeight = 40;
+            let yContentEnd = 290; // Start Y für Inhalt
+
+            // Wir simulieren das Layout kurz, um die End-Y-Position zu finden
+            if (isTeacher) {
+                const mainCrits = relCriteria.filter(c => c.type === 'main');
+                const secCrits = relCriteria.filter(c => c.type !== 'main');
+                
+                // Hauptfächer (2 Spalten -> halbe Höhe)
+                yContentEnd += Math.ceil(mainCrits.length / 2) * rowHeight;
+
+                if (secCrits.length > 0) {
+                    yContentEnd += spacerHeight; // Header Abstand
+                    yContentEnd += secCrits.length * rowHeight;
+                }
+            } else {
+                let lastType = 'main';
+                relCriteria.forEach(c => {
+                    if (c.type !== lastType) {
+                        yContentEnd += spacerHeight;
+                        lastType = c.type;
+                    }
+                    yContentEnd += rowHeight;
+                });
+            }
+
+            // Footer Position bestimmen (Mindestens bei 760px, sonst unter dem Inhalt)
+            const yFooter = Math.max(760, yContentEnd + 80);
+            
+            // Gesamthöhe bestimmen (Footer Position + Platz für Text & Rand unten)
+            // A4 Standard ist 842px. Wir verlängern, wenn nötig.
+            const h = Math.max(842, yFooter + 100); 
+            const w = 595; 
+
+            // --- 3. CANVAS & SVG SETUP ---
+            const dpr = window.devicePixelRatio || 1;
+            cvs.width = w * dpr;
+            cvs.height = h * dpr;
+            cvs.style.width = w + 'px';
+            cvs.style.height = h + 'px';
+            
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+
             let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><style>@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&amp;family=Inter:wght@400;600&amp;family=Dancing+Script:wght@700&amp;family=Courier+Prime:wght@700&amp;display=swap');</style></defs><rect width="100%" height="100%" fill="white"/>`;
 
-            const drawText = (text, x, y, size, font, align = "left", color = "#000000", weight = "normal") => {
+            // --- 4. HELPER ---
+            const drawText = (text, x, y, size, font, align = "left", color = "#000000", weight="normal") => {
                 ctx.fillStyle = color; ctx.textAlign = align;
                 let fontStack = 'Inter, sans-serif';
-                if (font === 'serif') fontStack = 'Merriweather, serif'; if (font === 'mono') fontStack = 'Courier Prime, monospace'; if (font === 'script') fontStack = 'Dancing Script, cursive';
-                ctx.font = `${weight} ${size}px ${fontStack}`; ctx.fillText(text, x, y);
-                let anchor = "start"; if (align === "center") anchor = "middle"; if (align === "right") anchor = "end";
+                if(font === 'serif') fontStack = 'Merriweather, serif';
+                if(font === 'mono') fontStack = 'Courier Prime, monospace';
+                if(font === 'script') fontStack = 'Dancing Script, cursive';
+                ctx.font = `${weight} ${size}px ${fontStack}`;
+                ctx.fillText(text, x, y);
+
+                let anchor = "start"; if(align === "center") anchor = "middle"; if(align === "right") anchor = "end";
                 const safeText = text.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 svg += `<text x="${x}" y="${y}" font-family="${fontStack}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}">${safeText}</text>`;
             };
-            const drawRect = (x, y, w, h, color) => { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${color}"/>`; };
-            const drawStrokeRect = (x, y, w, h, color) => { ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h); svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${color}" stroke-width="1"/>`; };
-            const drawLine = (x1, y1, x2, y2, color = "#000", width = 1, dash = []) => {
-                ctx.beginPath(); ctx.lineWidth = width; ctx.strokeStyle = color; ctx.setLineDash(dash); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
-                const dashAttr = dash.length > 0 ? `stroke-dasharray="${dash.join(',')}"` : ""; svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${dashAttr} />`;
+
+            const drawRect = (x, y, w, h, color) => {
+                ctx.fillStyle = color; ctx.fillRect(x, y, w, h);
+                svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${color}"/>`;
             };
 
-            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
-            drawStrokeRect(20, 20, w - 40, h - 40, "#000"); drawStrokeRect(24, 24, w - 48, h - 48, "#666");
-            drawText("HUMAN GRADES", w / 2, 60, 24, "sans", "center", "#1e293b", "900"); drawText("OFFIZIELLE BEWERTUNG", w / 2, 78, 10, "sans", "center", "#64748b", "normal");
+            const drawStrokeRect = (x, y, w, h, color) => {
+                ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h);
+                svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${color}" stroke-width="1"/>`;
+            };
 
-            const curY = new Date().getFullYear(); const nextY = (curY + 1).toString().substr(2);
-            drawText(`Zeitraum ${curY}/${nextY}`, 60, 100, 12, "sans", "left", "#000"); drawText("Datenstand: Aktuell", w - 60, 100, 12, "sans", "right", "#000");
+            const drawLine = (x1, y1, x2, y2, color="#000", width=1, dash=[]) => {
+                ctx.beginPath(); ctx.lineWidth = width; ctx.strokeStyle = color; ctx.setLineDash(dash);
+                ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+                const dashAttr = dash.length > 0 ? `stroke-dasharray="${dash.join(',')}"` : "";
+                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${dashAttr} />`;
+            };
 
-            drawText("Gesamtbewertung", w / 2, 140, 14, "sans", "center", "#000", "bold");
-            drawText(title, w / 2, 175, 32, "serif", "center", "#0f172a", "bold");
-            drawText("für", w / 2, 200, 16, "serif", "center", "#475569", "italic");
-            drawText(data.name, w / 2, 235, 26, "sans", "center", "#000", "bold");
-            drawLine(60, 255, w - 60, 255, "#0f172a", 2);
+            // Hintergrund
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,w,h);
 
-            const isTeacher = data.categoryId === 'lehrer'; let y = 290;
-            const avgs = data.averages || {};
-            const relCriteria = criteriaData.filter(c => (data.criteriaIds || []).includes(c.id));
-            relCriteria.sort((a, b) => (a.type === 'main' ? -1 : 1));
+            // --- 5. INHALT ZEICHNEN ---
 
-            const col1X = 70; const col1GradeX = 250; const col2X = 330; const col2GradeX = 510; const colSingleX = 140; const colSingleGradeX = 400;
+            // Rahmen (Passt sich jetzt dynamisch an h an)
+            drawStrokeRect(20, 20, w-40, h-40, "#000");
+            drawStrokeRect(24, 24, w-48, h-48, "#666");
+
+            // Header
+            drawText("HUMAN GRADES", w/2, 60, 24, "sans", "center", "#1e293b", "900");
+            drawText("OFFIZIELLE BEWERTUNG", w/2, 78, 10, "sans", "center", "#64748b", "normal");
+
+            const curY = new Date().getFullYear(); 
+            const nextY = (curY+1).toString().substr(2);
+            drawText(`Zeitraum ${curY}/${nextY}`, 60, 100, 12, "sans", "left", "#000");
+            drawText("Datenstand: Aktuell", w-60, 100, 12, "sans", "right", "#000");
+
+            drawText("Gesamtbewertung", w/2, 140, 14, "sans", "center", "#000", "bold");
+            drawText(title, w/2, 175, 32, "serif", "center", "#0f172a", "bold"); 
+            drawText("für", w/2, 200, 16, "serif", "center", "#475569", "italic");
+            drawText(data.name, w/2, 235, 26, "sans", "center", "#000", "bold");
+
+            drawLine(60, 255, w-60, 255, "#0f172a", 2);
+
+            // Noten Layout (Code wie gehabt, nur y-Variable)
+            let y = 290; 
+            const col1X = 70; const col1GradeX = 250;
+            const col2X = 330; const col2GradeX = 510;
+            const colSingleX = 140; const colSingleGradeX = 400;
 
             const renderRow = (crit, xTxt, xBox, yPos) => {
-                const val = avgs[crit.id] ? avgs[crit.id].toFixed(2) : "---"; const hasVal = !!avgs[crit.id];
-                drawText(crit.label, xTxt, yPos, 13, "sans", "left", "#1e293b", crit.type === 'main' ? "bold" : "normal");
+                const val = avgs[crit.id] ? avgs[crit.id].toFixed(2) : "---";
+                const hasVal = !!avgs[crit.id];
+                
+                drawText(crit.label, xTxt, yPos, 13, "sans", "left", "#1e293b", crit.type==='main'?"bold":"normal");
+                
                 let boxColor = "#ffffff";
-                if (hasVal) { const v = avgs[crit.id]; boxColor = v < 2.5 ? "#dcfce7" : (v > 4.5 ? "#fee2e2" : "#f1f5f9"); drawRect(xBox, yPos - 14, 60, 20, boxColor); }
-                else { drawStrokeRect(xBox, yPos - 14, 60, 20, "#e2e8f0"); }
-                drawText(val, xBox + 30, yPos, 13, "mono", "center", "#0f172a", "bold");
-                const estW = crit.label.length * 7; drawLine(xTxt + estW + 10, yPos - 4, xBox - 10, yPos - 4, "#cbd5e1", 1, [2, 3]);
+                if(hasVal) {
+                    const v = avgs[crit.id];
+                    boxColor = v < 2.5 ? "#dcfce7" : (v > 4.5 ? "#fee2e2" : "#f1f5f9");
+                    drawRect(xBox, yPos-14, 60, 20, boxColor);
+                } else {
+                    drawStrokeRect(xBox, yPos-14, 60, 20, "#e2e8f0");
+                }
+                
+                drawText(val, xBox+30, yPos, 13, "mono", "center", "#0f172a", "bold");
+                
+                // Linie (geschätzt)
+                const estimatedTextWidth = crit.label.length * 7; 
+                drawLine(xTxt + estimatedTextWidth + 10, yPos-4, xBox-10, yPos-4, "#cbd5e1", 1, [2, 3]);
             };
 
             if (isTeacher) {
-                let yL = y, yR = y; const mainCrits = relCriteria.filter(c => c.type === 'main'); const secCrits = relCriteria.filter(c => c.type !== 'main');
-                mainCrits.forEach((crit, i) => { const isLeft = i % 2 === 0; if (isLeft) { renderRow(crit, col1X, col1GradeX, yL); yL += 35; } else { renderRow(crit, col2X, col2GradeX, yR); yR += 35; } });
+                let yL = y, yR = y;
+                
+                // Hauptfächer
+                const mainCrits = relCriteria.filter(c => c.type === 'main');
+                mainCrits.forEach((crit, i) => {
+                    const isLeft = i % 2 === 0;
+                    if(isLeft) { renderRow(crit, col1X, col1GradeX, yL); yL += rowHeight; } 
+                    else { renderRow(crit, col2X, col2GradeX, yR); yR += rowHeight; }
+                });
+
+                // Wahlfächer
+                const secCrits = relCriteria.filter(c => c.type !== 'main');
                 let ySec = Math.max(yL, yR) + 25;
-                if (secCrits.length > 0) { drawText("Wahlpflichtfächer / Weitere", 70, ySec, 12, "sans", "left", "#64748b", "bold italic"); ySec += 30; secCrits.forEach(crit => { renderRow(crit, col1X, col1GradeX, ySec); ySec += 35; }); }
+                if (secCrits.length > 0) {
+                    drawText("Wahlpflichtfächer / Weitere", 70, ySec, 12, "sans", "left", "#64748b", "bold italic");
+                    ySec += 30;
+                    secCrits.forEach(crit => { 
+                        renderRow(crit, col1X, col1GradeX, ySec); 
+                        ySec += rowHeight; 
+                    });
+                }
             } else {
-                let lastType = 'main'; let yPos = y;
-                relCriteria.forEach(crit => { if (crit.type !== lastType) { yPos += 20; drawText("WEITERE MERKMALE", w / 2, yPos, 11, "sans", "center", "#94a3b8", "italic"); yPos += 30; lastType = crit.type; } renderRow(crit, colSingleX, colSingleGradeX, yPos); yPos += 35; });
+                let lastType = 'main';
+                relCriteria.forEach(crit => {
+                    if (crit.type !== lastType) {
+                        y += 20;
+                        drawText("WEITERE MERKMALE", w/2, y, 11, "sans", "center", "#94a3b8", "italic");
+                        y += 30;
+                        lastType = crit.type;
+                    }
+                    renderRow(crit, colSingleX, colSingleGradeX, y);
+                    y += rowHeight;
+                });
             }
 
-            const yF = 760; drawLine(60, yF, 260, yF, "#000");
+            // --- 6. FOOTER ZEICHNEN ---
+            // yFooter wurde oben schon berechnet
+            
+            // Left (Date)
+            drawLine(60, yFooter, 260, yFooter, "#000");
             const date = new Date().toLocaleDateString('de-DE');
-            drawText(date, 160, yF - 5, 12, "serif", "center", "#000", "italic"); drawText("Ausstellungsdatum", 160, yF + 15, 10, "sans", "center", "#64748b");
-            drawLine(335, yF, 535, yF, "#000");
-            drawText("Limo Organisation", 435, yF - 5, 18, "script", "center", "#000", "bold"); drawText("Human Grades Vereinigung", 435, yF + 15, 10, "sans", "center", "#64748b");
-            drawText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, w / 2, 815, 9, "sans", "center", "#94a3b8");
+            drawText(date, 160, yFooter - 5, 12, "serif", "center", "#000", "italic");
+            drawText("Ausstellungsdatum", 160, yFooter + 15, 10, "sans", "center", "#64748b");
 
-            svg += `</svg>`; currentSvgContent = svg; showView('view-certificate');
+            // Right (Sig)
+            drawLine(335, yFooter, 535, yFooter, "#000");
+            drawText("Limo Organisation", 435, yFooter - 5, 18, "script", "center", "#000", "bold");
+            drawText("Human Grades Vereinigung", 435, yFooter + 15, 10, "sans", "center", "#64748b");
+
+            // Tech ID (Jetzt sicher innerhalb des Rahmens und weit genug unten)
+            // yFooter + 60 ist sicher unter den Unterschriften und über h-40 (Rahmen unten)
+            drawText(`Generiert am ${new Date().toLocaleString()} | ID: ${data._id}`, w/2, yFooter + 55, 9, "sans", "center", "#94a3b8");
+
+            // Abschluss
+            svg += `</svg>`;
+            currentSvgContent = svg;
+            showView('view-certificate');
         }
-
+        
         // --- DOWNLOAD ---
         function downloadPNG() {
             const cvs = document.getElementById('cert-canvas');
